@@ -1,0 +1,7 @@
+﻿* {
+    outline:none !important;
+}
+
+.selectedRow {
+    border-bottom: 1px solid orange;
+}

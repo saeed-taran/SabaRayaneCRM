@@ -1,0 +1,15 @@
+﻿@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter]
+    public BootstrapTabContainer TabContainer { get; set; }
+
+    protected override void OnInitialized()
+    {
+        TabContainer.AddTab(this);
+    }
+}

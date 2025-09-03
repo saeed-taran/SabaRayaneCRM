@@ -1,0 +1,53 @@
+﻿<div class="modal fade" id="@Id" data-bs-backdrop="@(IsStatic ? "static" : "true")" data-bs-keyboard="false" tabindex="-1" aria-labelledby="@(@Id)Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-@BooststrapModalSize">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="@(@Id)Label">@Title</h5>
+                <button type="button" class="btn-close" aria-label="Close" @onclick=Close></button>
+            </div>
+            <div class="modal-body">
+                @Body
+            </div>
+            <div class="modal-footer">
+                @Footer
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public string Id { get; set; }
+
+    [Parameter]
+    public EventCallback OnModalClosed { get; set; }
+
+    [Parameter]
+    public RenderFragment Title { get; set; }
+
+    [Parameter]
+    public RenderFragment Body { get; set; }
+
+    [Parameter]
+    public RenderFragment Footer { get; set; }
+
+    [Parameter]
+    public bool IsStatic { get; set; }
+
+    [Parameter]
+    public BooststrapModalSize BooststrapModalSize { get; set; } = BooststrapModalSize.lg;
+
+    public async Task Open()
+    {
+        await jsRuntime.InvokeVoidAsync("eval", $"$('#{Id}').modal('show');");
+    }
+
+    public async Task Close()
+    {
+        if (OnModalClosed.HasDelegate)
+            await OnModalClosed.InvokeAsync();
+
+        await jsRuntime.InvokeVoidAsync("eval", $"$('#{Id}').modal('hide');");
+    }
+}

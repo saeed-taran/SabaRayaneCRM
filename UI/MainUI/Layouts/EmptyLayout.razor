@@ -1,0 +1,24 @@
+﻿@inherits LayoutComponentBase
+
+<HeadContent>
+    @if (translator.CurrentLanguage.IsLeftToRight)
+    {
+        <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="css/bootstrap/bootstrap.rtl.min.css" />
+    }
+</HeadContent>
+
+@Body
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        if (!translator.CurrentLanguage.IsLeftToRight)
+            await jsRuntime.InvokeVoidAsync("eval", "document.documentElement.classList.add('rtl')");
+
+        await base.OnInitializedAsync();
+    }
+}

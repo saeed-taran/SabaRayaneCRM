@@ -1,0 +1,79 @@
+﻿@using Microsoft.AspNetCore.Components.Rendering
+
+<a href="@Href" class="@_cssClass">
+    @ChildContent
+</a>
+
+@code {
+    private bool _isActive;
+    private const string DefaultActiveClass = "active";
+    private const string DefaultDisabledClass = "btn text-start disabled";
+
+    private string _cssClass = "";
+
+    [Parameter]
+    public bool Enabled { get; init; } = false;
+
+    [Parameter, EditorRequired]
+    public string Href { get; init; }
+
+    [Parameter]
+    public string? ActiveExpression { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
+
+    [Parameter]
+    public string DisabledClass { get; set; }
+
+    [Parameter]
+    public string ActiveClass{ get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    protected override void OnParametersSet()
+    {
+        _isActive = ShouldMatch(NavigationManager.Uri);
+        UpdateCssClass();
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        var shouldBeActiveNow = ShouldMatch(args.Location);
+        if (shouldBeActiveNow != _isActive)
+        {
+            _isActive = shouldBeActiveNow;
+            UpdateCssClass();
+            StateHasChanged();
+        }
+    }
+
+    private bool ShouldMatch(string currentUriAbsolute)
+    {
+        if (NavigationManager.Uri.ToLower().EndsWith("/" + Href.ToLower()))
+            return true;
+
+        if (ActiveExpression is not null && NavigationManager.Uri.ToLower().Contains(ActiveExpression.ToLower()))
+            return true;
+
+        return false;
+    }
+
+    private void UpdateCssClass()
+    {
+        _cssClass = _isActive ? CombineWithSpace(CssClass, ActiveClass ?? DefaultActiveClass) : CssClass;
+
+        _cssClass = !Enabled ? CombineWithSpace(_cssClass, DisabledClass ?? DefaultDisabledClass) : _cssClass;
+    }
+
+    private static string CombineWithSpace(string? str1, string str2)
+    => str1 == null ? str2 : $"{str1} {str2}";
+}

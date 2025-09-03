@@ -1,0 +1,259 @@
+﻿@typeparam ModelType
+
+@using System.Reflection
+@using System.ComponentModel.DataAnnotations
+@using Taran.Shared.Dtos.Attributes
+
+@{
+    var col = $"col-md-12 col-lg-6 col-xl-{12 / ColumnCount}";
+
+    var lableColSizeInInlineForm = InlineLables ? "col-lg-3" : "";
+    var inputColSizeInInlineForm = InlineLables ? "col-lg-9" : "";
+}
+
+@if (!string.IsNullOrWhiteSpace(Title))
+{
+    <h3 class="mb-3">@Title</h3>
+}
+
+<div class="row">
+    <div class="col-sm-12 mb-3 border-bottom pb-2">
+        @if (!string.IsNullOrWhiteSpace(ReturnUrl))
+        {
+            <a class="btn btn-sm ms-2 border text-dark" href="@ReturnUrl">
+                <b class="fas fa-forward text-warning"></b>
+                @translator.Translate(nameof(KeyWords.Return))
+            </a>
+        }
+        @if (Buttons.HasFlag(DynamicFormsButtons.Cancel))
+        {
+            <button type="button" @onclick="Cancel" class="btn btn-sm ms-2 border">
+                <i class="fas fa-window-close text-danger"></i>
+                @translator.Translate(nameof(KeyWords.Cancel))
+            </button>
+        }
+        @if (Buttons.HasFlag(DynamicFormsButtons.OK))
+        {
+            <button type="button" @onclick="() => Submit(true)" class="btn btn-sm ms-2 border">
+                <i class="fa fa-save text-black"></i>
+                @translator.Translate(nameof(KeyWords.Submit))
+            </button>
+        }
+        @if (Buttons.HasFlag(DynamicFormsButtons.SubmitAndNew))
+        {
+            <button type="button" @onclick="() => Submit(false)" class="btn btn-sm ms-2 border">
+                <i class="fas fa-plus text-success"></i>
+                @translator.Translate(nameof(KeyWords.SubmitAndNew))
+            </button>
+        }        
+        <span class="text-danger mt-2">@ErrorMessage</span>
+    </div>
+    @foreach (var property in Model.GetType().GetProperties())
+    {
+        if (HiddenFields.Contains(property.Name))
+            continue;
+
+        <div class="@col">
+            @if (!fieldStatusDict.ContainsKey(property.Name))
+                fieldStatusDict[property.Name] = new FieldsVisualStatus();
+
+            <div class="row form-group">
+                <div class="@lableColSizeInInlineForm">
+                    @if (AliasFields.ContainsKey(property.Name))
+                    {
+                        <lable class="form-label">@translator.Translate(AliasFields[property.Name]):</lable>
+                    }
+                    else
+                    {
+                        <lable class="form-label">@translator.Translate(property.Name):</lable>
+                    }
+                </div>
+                <div class="@inputColSizeInInlineForm">
+                    @if (DropDownFields.ContainsKey(property.Name))
+                    {
+                        <select value="@property.GetValue(Model)?.ToString()" @onchange="e => FieldValueChanged(property, e)" class="@fieldStatusDict[property.Name]?.InputElementClass form-control form-control-sm text-black">
+                            @foreach (var item in DropDownFields[property.Name])
+                            {
+                                <option value="@item.Item1">@item.Item2</option>
+                            }
+                        </select>
+                    }
+                    else if(property.GetCustomAttribute<DateAttribute>() is not null)
+                    {
+                        var dateInputId = "df_" + this.Id + "_" + property.Name;
+                        <input id="@dateInputId" value="@property.GetValue(Model)?.ToString()" @onchange="e => FieldValueChanged(property, e)" onblur="this.dispatchEvent(new Event('change'));" class="DateInput @fieldStatusDict[property.Name]?.InputElementClass form-control form-control-sm text-black" autocomplete="off" />
+                    }
+                    else
+                    {
+                        @switch (property.PropertyType.FullName)
+                        {
+                            case "System.String":
+                                var type = SecrectFields.Contains(property.Name) ? "password" : "text";
+                                <input type="@type" value="@property.GetValue(Model)?.ToString()" @onchange="e => FieldValueChanged(property, e)" class="@fieldStatusDict[property.Name]?.InputElementClass form-control form-control-sm text-black" />
+                                break;
+                            case "System.Boolean":
+                                bool isChecked = (bool)(property.GetValue(Model) ?? false);
+                                <input type="checkbox" checked="@isChecked" @onchange="e => FieldValueChanged(property, e)" class="@fieldStatusDict[property.Name]?.InputElementClass" />
+                                break;
+                            case "System.Int32":
+                                <input type="number" value="@property.GetValue(Model)?.ToString()" @onchange="e => FieldValueChanged(property, e)" class="@fieldStatusDict[property.Name]?.InputElementClass form-control form-control-sm text-black" />
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    @* this lable is for reserving vertical space for error lable *@
+                    <label class="invisible d-inline-block">.</label>
+                    <lable class="invalid-feedback d-inline">@fieldStatusDict[property.Name]?.ErrorMessage</lable>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public ModelType Model { get; init; }
+
+    [Parameter, EditorRequired]
+    public string Id { get; init; }
+
+    [Parameter]
+    public bool InlineLables { get; init; } = true;
+
+    [Parameter]
+    public string? Title{ get; init; }
+
+    [Parameter]
+    public string? ReturnUrl { get; init; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<DynamicFormSubmitEventArgs> OnSubmit { get; init; }
+
+    [Parameter]
+    public List<string> HiddenFields { get; init; } = new();
+
+    [Parameter]
+    public List<string> SecrectFields { get; init; } = new();
+
+    [Parameter]
+    public EventCallback OnCancel { get; init; }
+
+    [Parameter]
+    public int ColumnCount { get; set; } = 1;
+
+    [Parameter]
+    public DynamicFormsButtons Buttons { get; set; } = DynamicFormsButtons.OK | DynamicFormsButtons.Cancel;
+
+    private Dictionary<string, List<(int, string)>> DropDownFields = new();
+
+    private Dictionary<string, FieldsVisualStatus> fieldStatusDict = new();
+    private Dictionary<string, string> AliasFields { get; init; } = new();
+
+    public string? ErrorMessage { get; private set; }
+
+    public void SetErrorMessage(string errorMessage)
+    {
+        ErrorMessage = errorMessage ?? "";
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        if (Model is null)
+            throw new ArgumentNullException(nameof(Model));
+        if (!OnSubmit.HasDelegate)
+            throw new ArgumentNullException(nameof(OnSubmit));
+
+        return base.OnInitializedAsync();
+    }
+
+    protected void FieldValueChanged(PropertyInfo propertyInfo, ChangeEventArgs e)
+    {
+        object safeValue;
+        if ((e.Value == null || string.IsNullOrEmpty(e.Value + "")))
+        {
+            if (propertyInfo.PropertyType == typeof(string))
+                safeValue = "";
+            else
+                safeValue = Activator.CreateInstance(propertyInfo.PropertyType);
+        }
+        else
+            safeValue = Convert.ChangeType(e.Value, propertyInfo.PropertyType);
+        
+        propertyInfo.SetValue(Model, safeValue);
+    }
+
+    protected async void Submit(bool closeForm)
+    {
+        if (!Validate())
+            return;
+
+        await OnSubmit.InvokeAsync(new DynamicFormSubmitEventArgs { CloseForm = closeForm });
+
+        if (!closeForm)
+        {
+            foreach (var key in fieldStatusDict.Keys)
+            {
+                fieldStatusDict[key].Clear();
+            }
+        }
+    }
+
+    protected async Task Cancel()
+    {
+        await OnCancel.InvokeAsync();
+    }
+
+    public bool Validate()
+    {
+        var ctx = new ValidationContext(Model);
+        List<ValidationResult> validationResults = new List<ValidationResult>();
+
+        bool isValid = Validator.TryValidateObject(Model, ctx, validationResults, true);
+
+        foreach (var fieldStatus in fieldStatusDict)
+        {
+            var currenctFieldError = validationResults.FirstOrDefault(r => r.MemberNames.First() == fieldStatus.Key);
+            if (currenctFieldError is null)
+                fieldStatus.Value.SetValid();
+            else
+                fieldStatus.Value.SetError(currenctFieldError.ErrorMessage ?? translator.Translate(nameof(KeyWords.Error)));
+        }
+
+        return isValid;
+    }
+
+    public void AddDropDownField(string fieldName, List<(int, string)> items)
+    {
+        DropDownFields[fieldName] = items;
+    }
+
+    public void AddAliasField(string fieldName, string alias)
+    {
+        AliasFields[fieldName] = alias;
+    }
+
+    private class FieldsVisualStatus
+    {
+        public string InputElementClass { get; private set; } = "";
+        public string ErrorMessage { get; private set; } = "";
+
+        public void SetError(string errorMessage)
+        {
+            ErrorMessage = errorMessage;
+            InputElementClass = "is-invalid";
+        }
+
+        public void SetValid()
+        {
+            ErrorMessage = "";
+            InputElementClass = "is-valid";
+        }
+
+        public void Clear()
+        {
+            ErrorMessage = "";
+            InputElementClass = "";
+        }
+    }
+}

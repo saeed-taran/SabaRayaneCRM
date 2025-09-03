@@ -1,0 +1,43 @@
+﻿@using Taran.UI.Main.Services.IdentityServices
+@using Taran.Identity.Access
+@using Taran.Shared.Dtos.Languages
+@using Taran.Shared.UI.Components.Link
+
+@inject IRoleService roleService
+
+<div class="top-row ps-3 navbar navbar-dark company-brand">
+    <div class="container-fluid">
+        <a class="navbar-brand" ref="">@translator.Translate(nameof(KeyWords.CompanyName))</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <div class="accordion accordion-flush" id="accordionFlushExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="CurrencyMenu">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false">
+                    <span class="bi fas fa-money-bill-wave" aria-hidden="true"></span>
+                    @translator.Translate(nameof(KeyWords.IdentityManagement))
+                </button>
+            </h2>
+            <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="CurrencyMenu" data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body ps-0 pe-0">
+                    <div class="nav-item px-3">
+                        <Link CssClass="nav-link" Enabled="@roleService.HaveAccess(AccessNames.User_Get)" Href="currency">
+                            <span class="bi fas fa-money-bill-wave" aria-hidden="true"></span> @translator.Translate(nameof(KeyWords.User))
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code{
+    public void Refresh()
+    {
+        StateHasChanged();
+    }
+}

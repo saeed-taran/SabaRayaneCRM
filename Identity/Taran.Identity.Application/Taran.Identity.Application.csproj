@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\Taran.Shared.Application\Taran.Shared.Application.csproj" />
+    <ProjectReference Include="..\..\Shared\Taran.Shared.Infrastructure\Taran.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Shared\Taran.Shared.Application\Taran.Shared.Application.csproj" />
+    <ProjectReference Include="..\..\Shared\Taran.Shared.Core\Taran.Shared.Core.csproj" />
+    <ProjectReference Include="..\Taran.Identity.Core\Taran.Identity.Core.csproj" />
+    <ProjectReference Include="..\Taran.Identity.Dtos\Taran.Identity.Dtos.csproj" />
+  </ItemGroup>
+
+</Project>

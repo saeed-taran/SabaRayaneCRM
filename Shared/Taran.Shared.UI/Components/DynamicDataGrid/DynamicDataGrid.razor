@@ -1,0 +1,274 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+
+<div class="position-relative user-select-none">
+    <div class="w-100 table-responsive @(translator.CurrentLanguage.IsLeftToRight ? "grid-main-container-ltr" : "grid-main-container-rtl")">
+        <table class="quickgrid table table-borderless shadow-none">
+            <thead>
+                <tr>
+                    @foreach (var col in Columns)
+                    {
+                        <td @onclick=@(async (e) => { await SortChanged(col.Key); }) class="pointer">
+                            <span class="me-1">
+                                @col.Value
+                            </span>
+                            
+                            @{
+                                bool? sorted = null;
+                                SortBy.TryGetValue(col.Key, out sorted);
+                                if (sorted == true)
+                                {
+                                    <span>
+                                        <i class="fas fa-angle-down"></i>
+                                    </span>
+                                }
+                                else if (sorted == false)
+                                {
+                                    <span>
+                                        <i class="fas fa-angle-up"></i>
+                                    </span>
+                                }
+                            }
+                        </td>
+                    }
+                </tr>
+                <tr>
+                    @foreach (var col in Columns)
+                    {
+                        <td>
+                            <input class="form-control form-control-sm" @onchange=@(async (e) => { await InputChanged(col.Key, e.Value?.ToString()); }) />
+                        </td>
+                    }
+                </tr>
+            </thead>
+            <tbody @onkeydown:preventDefault=preventDefault @onkeydown=OnGridKeyDown @onkeyup=OnGridKeyUp @onmousedown=OnGridMouseDown tabindex="0">
+                @{ int rowIndex = -1; }
+                @foreach (JObject row in Data)
+                {
+                    rowIndex++;
+                    string rowClass = _SelectedRows.ContainsKey(row[KeyColumn].ToString()) ? "bg-info" : "";
+
+                    if (rowIndex == SelectedRowIndex)
+                    {
+                        rowClass += " selectedRow";
+                    }
+                    
+                    int localRowIndex = rowIndex;
+                    <tr class="@rowClass" onmousedown=@((MouseEventArgs e) => RowClicked(e, row, localRowIndex)) onmouseover=@((MouseEventArgs e)=>{ OnRowMouseMove(e, row); })>
+                        @foreach (var col in Columns)
+                        {
+                            <td>
+                                @row[col.Key]
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Dictionary<string, string> Columns { get; set; } = new();
+    private JArray Data = new();
+
+    [Parameter]
+    public Func<Dictionary<string, string>, Dictionary<string, bool?>, Task> FilterChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnEnterPressed { get; set; }
+
+    private int SelectedRowIndex = -1;
+
+    public Dictionary<string, JObject> _SelectedRows = new();
+    public IReadOnlyDictionary<string, JObject> SelectedRows => _SelectedRows;
+
+    private string KeyColumn;
+
+    private Dictionary<string, string> Filters { get; set; }
+    private Dictionary<string, bool?> SortBy { get; set; }
+
+    private bool preventDefault = false;
+    private bool isShiftKeyDown = false;
+    private bool mouseDownStartedOnGrid = false;
+
+    private bool CtrlAPressed = false;
+
+    public void Refresh(string data, Dictionary<string, string> columns, string keyColumn)
+    {
+        _SelectedRows.Clear();
+
+        Data = Newtonsoft.Json.Linq.JArray.Parse(data);
+        Columns = columns;
+        KeyColumn = keyColumn;
+
+        if (Filters is null)
+            Filters = new Dictionary<string, string>();
+
+        if (SortBy is null)
+            SortBy = new Dictionary<string, bool?>();
+
+        if (Data.Count <= SelectedRowIndex)
+            SelectedRowIndex = Data.Count - 1;
+
+        StateHasChanged();
+    }
+
+    private async Task AcceptSelectedRows()
+    {
+        if (OnEnterPressed.HasDelegate)
+            await OnEnterPressed.InvokeAsync();
+    }
+
+    protected async Task InputChanged(string columnName, string? value)
+    {
+        Filters[columnName] = value ?? "";
+        await FilterChanged.Invoke(Filters, SortBy);
+    }
+
+    protected async Task SortChanged(string columnName)
+    {
+        if (SortBy.ContainsKey(columnName))
+        {
+            var prevValue = SortBy[columnName];
+            if (prevValue is null)
+                SortBy[columnName] = true;
+            else if (prevValue == false)
+                SortBy[columnName] = null;
+            else if (prevValue == true)
+                SortBy[columnName] = false;
+        }
+        else
+            SortBy[columnName] = true;
+
+        if (FilterChanged is not null)
+            await FilterChanged.Invoke(Filters, SortBy);
+    }
+
+    protected async Task RowClicked(MouseEventArgs e, JObject rowObject, int rowIndex)
+    {
+        if (e.Buttons == 1)
+        {
+            var clickedRowKey = rowObject[KeyColumn].ToString();
+            if (_SelectedRows.ContainsKey(clickedRowKey))
+                _SelectedRows.Remove(clickedRowKey);
+            else
+                _SelectedRows[clickedRowKey] = rowObject;
+
+            if (isShiftKeyDown)
+            {
+                var increaseSteps = SelectedRowIndex < rowIndex;
+
+                for (var i = SelectedRowIndex; (increaseSteps ? i < rowIndex : i > rowIndex); i += (increaseSteps ? 1 : -1))
+                {
+                    var rowKey = Data[i][KeyColumn].ToString();
+                    _SelectedRows[rowKey] = Data[i] as JObject;
+                }
+            }
+            SelectedRowIndex = rowIndex;
+
+            StateHasChanged();
+        }
+        else if (e.Buttons == 4)
+        {
+            if (!_SelectedRows.Any())
+            {
+                var clickedRowKey = rowObject[KeyColumn].ToString();
+                if (_SelectedRows.ContainsKey(clickedRowKey))
+                    _SelectedRows.Remove(clickedRowKey);
+                else
+                    _SelectedRows[clickedRowKey] = rowObject;
+            }
+            await AcceptSelectedRows();
+        }
+    }
+
+    protected void OnRowMouseMove(MouseEventArgs e, JObject rowObject)
+    {
+        if (e.Buttons == 1)
+        {
+            if (mouseDownStartedOnGrid)
+            {
+                var clickedRowKey = rowObject[KeyColumn].ToString();
+                if (_SelectedRows.ContainsKey(clickedRowKey))
+                    _SelectedRows.Remove(clickedRowKey);
+                else
+                    _SelectedRows[clickedRowKey] = rowObject;
+
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            mouseDownStartedOnGrid = false;
+        }
+    }
+
+    private async Task OnGridKeyDown(KeyboardEventArgs e)
+    {
+        preventDefault = false;
+        isShiftKeyDown = e.ShiftKey;
+
+        Console.WriteLine("isShiftKeyDown:" + isShiftKeyDown);
+
+        if (e.CtrlKey && e.Code.ToLower() == "keya")
+        {
+            preventDefault = true;
+            if (CtrlAPressed)
+            {
+                _SelectedRows.Clear();
+                CtrlAPressed = false;
+            }
+            else
+            {
+                CtrlAPressed = true;
+                foreach (JObject row in Data)
+                {
+                    _SelectedRows[row[KeyColumn].ToString()] = row;
+                }
+            }
+        }
+        else if (e.Key.ToLower() == "enter")
+        {
+            await AcceptSelectedRows();
+        }
+        else if (e.Key.ToLower() == "arrowdown")
+        {
+            if (isShiftKeyDown)
+                await ToggleRowSelectionByIndex(SelectedRowIndex);
+            if(SelectedRowIndex < Data.Count - 1)
+                SelectedRowIndex++;
+        }
+        else if (e.Key.ToLower() == "arrowup")
+        {
+            if (isShiftKeyDown)
+                await ToggleRowSelectionByIndex(SelectedRowIndex);
+            if (SelectedRowIndex > 0)
+                SelectedRowIndex--;
+        }
+        else if (e.Code.ToLower() == "space" && SelectedRowIndex > -1)
+        {
+            await ToggleRowSelectionByIndex(SelectedRowIndex);
+        }
+    }
+
+    private void OnGridKeyUp(KeyboardEventArgs e)
+    {
+        isShiftKeyDown = e.ShiftKey;
+    }
+
+    private async Task ToggleRowSelectionByIndex(int index)
+    {
+        var rowKey = Data[index][KeyColumn].ToString();
+        if (_SelectedRows.ContainsKey(rowKey))
+            _SelectedRows.Remove(rowKey);
+        else
+            _SelectedRows[rowKey] = Data[index] as JObject;
+    }
+    private void OnGridMouseDown(MouseEventArgs e)
+    {
+        mouseDownStartedOnGrid = true;
+    }
+}

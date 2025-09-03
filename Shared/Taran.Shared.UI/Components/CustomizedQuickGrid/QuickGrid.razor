@@ -1,0 +1,452 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Rendering
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Taran.Shared.Dtos.Attributes
+@using Taran.Shared.UI.Components.CustomizedQuickGrid.Columns
+@using Taran.Shared.UI.Components.CustomizedQuickGrid.Infrastructure
+@using System.Reflection
+
+@typeparam TGridItem
+
+<CascadingValue TValue="InternalGridContext<TGridItem>" IsFixed="true" Value="@_internalGridContext">
+    @{ StartCollectingColumns(); }
+    @ChildContent
+    <Defer>
+        @{ FinishCollectingColumns(); }
+        <ColumnsCollectedNotifier TGridItem="TGridItem" />
+        <div class="position-relative">
+            <div class="w-100 table-responsive @(translator.CurrentLanguage.IsLeftToRight ? "grid-main-container-ltr" : "grid-main-container-rtl")">
+                <table id="@Id" theme="@Theme" aria-rowcount="@(_ariaBodyRowCount + 1)" @ref="_tableReference" @onclosecolumnoptions="CloseColumnOptions"
+                       @attributes="AdditionalAttributes" class="@GridClass()" @onkeyup="AsyncCallbackWithoutStateChange<KeyboardEventArgs>.Create(TableKeyUp)">
+                    <thead>
+                        <tr>
+                            @_renderColumnHeaders
+                        </tr>
+                        @if (_columns.Any(c => c.ColumnOptions is not null))
+                        {
+                            <tr class="headerOptions">
+                                @_renderColumnHeadersOptions
+                            </tr>
+                        }
+                    </thead>
+                    <tbody>
+                        @if (Virtualize)
+                        {
+                            <Virtualize @ref="@_virtualizeComponent"
+                                TItem="(int RowIndex, TGridItem Data)"
+                                ItemSize="@ItemSize"
+                                OverscanCount="@OverscanCount"
+                                ItemsProvider="@ProvideVirtualizedItems"
+                                ItemContent="@(item => builder => RenderRow(builder, item.RowIndex, item.Data))"
+                                Placeholder="@(placeholderContext => builder => RenderPlaceholderRow(builder, placeholderContext))" />
+                        }
+                        else
+                        {
+                            @_renderNonVirtualizedRows
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </Defer>
+</CascadingValue>
+
+@code {
+    private void RenderNonVirtualizedRows(RenderTreeBuilder __builder)
+    {
+        var initialRowIndex = 2; // aria-rowindex is 1-based, plus the first row is the header
+        var rowIndex = initialRowIndex;
+
+        foreach (var item in _currentNonVirtualizedViewItems)
+        {
+            RenderRow(__builder, rowIndex++, item);
+        }
+
+        RenderCreateItemRow(__builder, rowIndex++);
+    }
+
+    private void RenderRow(RenderTreeBuilder __builder, int rowIndex, TGridItem item)
+    {
+        var rowCLass = rowIndex == _selectedRowIndex ? "selected-row" : "";
+        <tr @key="@(ItemKey(item))" aria-rowindex="@rowIndex" @ondblclick="@(() => RowDoubleClicked(rowIndex, item))" @onclick="@(()=>{ RowClicked(rowIndex, item); })" class="@rowCLass">
+            @foreach (var col in _columns)
+            {
+                var columnClass = rowIndex == _editingRowIndex ? "editing-td" : "view-td";
+                <td class="@ColumnClass(col) @columnClass" @key="@col" title="@col.GetCellContent(item)">
+                    @if (rowIndex == _editingRowIndex && col.EditTemplate is not null && col.EditTemplate.EditTemplateUsage != EditTemplateUsage.Create)
+                    {
+                        var property = _editingObjectProperties.FirstOrDefault(p => p.Name == col.EditTemplate.PropertyName);
+                        if (property is null)
+                        {
+                            <lable class="errorLable">editing object dosnt have a property with name "@col.EditTemplate.PropertyName"</lable>
+                        }
+                        else
+                        {
+                            var value = @property.GetValue(_editingObject)?.ToString();
+                            if (property.PropertyType.IsEnum)
+                            {
+                                value = ((int)property.GetValue(_editingObject)).ToString();
+                            }
+                            RenderCreateEditComponent(__builder, col.EditTemplate, value, _editingObject, property, "form-control  text-black", "form-check-input mt-2", rowIndex, col, item);
+                        }
+                    }
+                    else
+                    {
+                        var property = _gridItemProperties.FirstOrDefault(p => p.Name == col.EditTemplate?.PropertyName);
+
+                        TypeCode? typeCode = null;
+                        if (property is not null)
+                        {
+                            typeCode = Type.GetTypeCode(property.PropertyType);
+                            if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                            {
+                                typeCode = Type.GetTypeCode(Nullable.GetUnderlyingType(property.PropertyType));
+                            }
+                        }
+
+                        if (property is not null && typeCode == TypeCode.Boolean)
+                        {
+                            bool isChecked = ((bool?)property.GetValue(item) ?? false);
+                            if (isChecked)
+                            {
+                                <input type='checkbox' disabled checked />
+                            }
+                            else
+                            {
+                                <input type='checkbox' disabled />
+                            }
+                        }
+                        else
+                        {
+                            col.CellContent(__builder, item);
+                        }
+                    }
+                </td>
+            }
+
+            <td class="fitTD pt-2 @(FixedToolsColumn ? "first-col-fixed end-0" : "")" style="width:@(ActionColumnWidth)px">
+                @if (OnDelete is not null)
+                {
+                    <span @onclick="@(() => DeleteItem(item))" class="m-1" role="button">
+                        <i class="fas fa-trash text-danger"></i>
+                    </span>
+                }
+                @if (OnSaveEdit is not null && EditingObjectType is not null)
+                {
+                    <span @onclick="@(() => StartEditing(rowIndex, item))" class="m-1" role="button">
+                        <i class="fas fa-edit text-dark"></i>
+                    </span>
+                }
+                else if (CustomeEditAction.HasDelegate)
+                {
+                    <span @onclick="@(async () => await CustomeEditAction.InvokeAsync(item))" class="m-1" role="button">
+                        <i class="fas fa-edit text-dark"></i>
+                    </span>
+                }
+
+                @foreach (var customeAction in CustomeActions)
+                {
+                    <span @onclick="@(async () => await customeAction.Function(item))" class="m-1" role="button">
+                        <i class="@customeAction.Class"></i>
+                    </span>
+                }
+
+                @{
+                    var saveCancelButtonsDisplay = rowIndex == _editingRowIndex ? "" : "hidden";
+
+                    <span @onclick="CloseEdit" class="m-1 @saveCancelButtonsDisplay" role="button">
+                        <i class="fas fa-window-close text-danger"></i>
+                    </span>
+                    <span @onclick="SaveEdit" class="m-1 @saveCancelButtonsDisplay" role="button">
+                        <i class="fas fa-save text-black"></i>
+                    </span>
+                }
+            </td>    
+            
+        </tr>
+    }
+
+    private async Task RowDoubleClicked(int rowIndex, TGridItem item)
+    {
+        if (EditingObjectType is not null)
+            await StartEditing(rowIndex, item);
+
+        if (OnRowDoubleCkicked.HasDelegate)
+            await OnRowDoubleCkicked.InvokeAsync(item);
+    }
+
+    private async Task RowClicked(int rowIndex, TGridItem item)
+    {
+        _selectedRowIndex = rowIndex; 
+        _selectedItem = item;
+        if (OnSelectedChanged.HasDelegate)
+            await OnSelectedChanged.InvokeAsync(item);
+    }
+
+    private async Task TableKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter")
+        {
+            if (_editingRowIndex != -1)
+            {
+                await SaveEdit();
+                StateHasChanged();
+            }
+            else if (_showNewItemRow)
+            {
+                await SaveCreate();
+                StateHasChanged();
+            }
+        }
+
+        if (e.Code == "Escape")
+        {
+            if (_editingRowIndex != -1 || _showNewItemRow)
+            {
+                CloseEdit();
+                StateHasChanged();
+            }
+        }
+    }
+
+    private record AsyncCallbackWithoutStateChange<Input>(Func<Input, Task> Callback) : IHandleEvent
+    {
+        public static Func<Input, Task> Create(Func<Input, Task> callback) => new AsyncCallbackWithoutStateChange<Input>(callback).Invoke;
+
+        public Task Invoke(Input input) => Callback(input);
+        public Task HandleEventAsync(EventCallbackWorkItem item, object arg) => item.InvokeAsync(arg);
+    }
+
+    private void RenderCreateItemRow(RenderTreeBuilder __builder, int rowIndex)
+    {
+        if ((OnSaveNew is null || CreatingObjectType is null) && string.IsNullOrWhiteSpace(CreatingPageUrl))
+            return;
+
+        <tr @key="@(0)" aria-rowindex="@rowIndex" class="border-bottom border-dark">
+
+            @foreach (var col in _columns)
+            {
+                <td class="@ColumnClass(col)" @key="@col">
+                    @if (CreatingObjectType is not null && col.EditTemplate is not null && col.EditTemplate.EditTemplateUsage != EditTemplateUsage.Edit)
+                    {
+                        var property = _creatingObjectProperties.FirstOrDefault(p => p.Name == col.EditTemplate.PropertyName);
+                        if (property is null)
+                        {
+                            <lable class="errorLable">creating object dosnt have a property with name "@col.EditTemplate.PropertyName"</lable>
+                        }
+                        else
+                        {
+                            var value = "";
+                            if (_creatingObject is not null)
+                            {
+                                if(property.PropertyType.IsEnum)
+                                    value = ((int)property.GetValue(_creatingObject)).ToString();
+                                else
+                                    value = property.GetValue(_creatingObject)?.ToString();
+                            }
+
+                            if (_showNewItemRow)
+                                RenderCreateEditComponent(__builder, col.EditTemplate, value, _creatingObject, property, "form-control  text-black", "form-check-input mt-2", rowIndex, col, null);
+                            else
+                            {
+                                //only for reserving height 
+                                <input class="form-control form-control-sm visibility-hidden" />
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //only for reserving height
+                        <input class="form-control form-control-sm visibility-hidden" />
+                    }
+                </td>
+            }
+
+            <td class="fitTD @(_showNewItemRow ? "pt-2" : "") @(FixedToolsColumn ? "first-col-fixed end-0" : "")" style="width:@(ActionColumnWidth)px">
+                @if (!_showNewItemRow)
+                {
+                    if (CreatingObjectType is not null && CreatingEnabled)
+                    {
+                        <span @onclick="@(() => StartCreating(rowIndex))" class="btn btn-sm border m-1" role="button">
+                            <i class="fas fa-plus text-black"></i>
+                            @translator.Translate(nameof(KeyWords.Create))
+                        </span>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(CreatingPageUrl))
+                    {
+                        <span class="btn btn-sm border m-1" role="button">
+                            <a class="text-decoration-none text-black" href="@CreatingPageUrl">
+                                <i class="fas fa-plus text-black"></i>
+                                @translator.Translate(nameof(KeyWords.Create))
+                            </a>
+                        </span>
+                    }
+                }
+                else
+                {
+                    <span @onclick="CloseEdit" class="m-1 mt-2" role="button">
+                        <i class="fas fa-window-close text-danger"></i>
+                    </span>
+                    <span @onclick="SaveCreate" class="m-1 mt-2" role="button">
+                        <i class="fas fa-save text-black"></i>
+                    </span>
+                }
+            </td>
+        </tr>
+    }
+
+    private void RenderPlaceholderRow(RenderTreeBuilder __builder, PlaceholderContext placeholderContext)
+    {
+        <tr aria-rowindex="@(placeholderContext.Index + 1)">
+            @foreach (var col in _columns)
+            {
+                <td class="grid-cell-placeholder @ColumnClass(col)" @key="@col">@{ col.RenderPlaceholderContent(__builder, placeholderContext); }</td>
+            }
+        </tr>
+    }
+
+    private void RenderColumnHeaders(RenderTreeBuilder __builder)
+    {
+        foreach (var col in _columns)
+        {
+            <th class="@ColumnHeaderClass(col)" aria-sort="@AriaSortValue(col)" @key="@col" scope="col">
+                <div class="col-header-content">@col.HeaderContent</div>
+            </th>
+        }
+
+        <td class="fitTD @(FixedToolsColumn ? "first-col-fixed end-0" : "")" style="width:@(ActionColumnWidth)px"></td>
+    }
+
+    private void RenderColumnHeadersOptions(RenderTreeBuilder __builder)
+    {
+        foreach (var col in _columns)
+        {
+            <th class="@ColumnHeaderClass(col)" @key="@col" scope="col">
+                @if (col.ColumnOptions is not null)
+                {
+                    @col.ColumnOptions
+                }
+            </th>
+        }
+
+        <td class="fitTD @(FixedToolsColumn ? "first-col-fixed end-0" : "")"></td>
+    }
+
+    private void RenderCreateEditComponent(RenderTreeBuilder __builder, EditTemplate editTemplate, string value, object objectInstance, PropertyInfo property, string inputsClass, string checkBoxInputClass, int rowIndex, ColumnBase<TGridItem> columnBase, object rowItem)
+    {
+        var inputId = this.Id + "_" + property.Name;
+
+        if (editTemplate.IsEnableFunction is not null)
+        {
+            if (editTemplate.IsEnableFunction(objectInstance))
+            {
+                MakeDropDownsSearchableById(inputId, value);
+            }
+            else
+            {
+                property.SetValue(objectInstance, null);
+                ClearSearchableDropDowns($"#{inputId}");
+                return;
+            }
+        }
+
+        if (editTemplate.ThirdPartyComponent is not null)
+        {
+            editTemplate.ThirdPartyComponent.ValueChanged = async (value) => { await InputValueChanged(objectInstance, property, new ChangeEventArgs { Value = value }, editTemplate); };
+            var displayText = editTemplate.ThirdPartyComponent.DisplayText ?? (columnBase is not null && rowItem is not null ? columnBase.GetCellContent((TGridItem)rowItem) : "");
+            <div class="position-relative">
+                <input id="@inputId" type="text" value="@displayText" class="@inputsClass @fieldStatusDict[property.Name]?.InputElementClass bg-white" disabled />
+                <span @onclick="@editTemplate.ThirdPartyComponent.Show" class="position-absolute top-0 end-0 w-100 h-100 text-end" role="button">
+                    @if (value is not null)
+                    {
+                        <button @onclick:stopPropagation="true" @onclick=@(()=>{ property.SetValue(objectInstance, null); editTemplate.ThirdPartyComponent.EmptyDisplayText(); StateHasChanged(); })>
+                            <i class="fas fa-times fa-fw me-2 mt-1 pt-1">
+                            </i>
+                        </button>
+                    }
+                </span>
+                <span class="invalid-feedback">
+                    <i class="fas fa-exclamation-circle"></i>
+                    @translator.Translate(fieldStatusDict[property.Name]?.ErrorMessage ?? "")
+                </span>
+            </div>
+        }
+        else if (editTemplate.AutoCompleteItemsProvider is not null)
+        {
+
+        }
+        else if (editTemplate.DropDownItems is not null)
+        {
+            var optionsContainValue = false;
+            <select id="@inputId" @onchange="@(e => InputValueChanged(objectInstance, property, e, editTemplate))" class="@inputsClass @fieldStatusDict[property.Name]?.InputElementClass">
+                <option value=""></option>
+                @foreach (var option in editTemplate.DropDownItems)
+                {
+                    var selected = (value == option.Item1.ToString());
+                    if (selected)
+                        optionsContainValue = true;
+                    <option value="@option.Item1" selected="@(selected)">
+                        @option.Item2
+                    </option>
+                }
+            </select>
+            @if (!optionsContainValue)
+            {
+                property.SetValue(objectInstance, null);
+            }
+            <span class="invalid-feedback">
+                <i class="fas fa-exclamation-circle"></i>
+                @translator.Translate(fieldStatusDict[property.Name]?.ErrorMessage ?? "")
+            </span>
+
+            MakeDropDownsSearchableById(inputId, value);
+        }
+        else if (property.GetCustomAttribute<DateAttribute>() is not null)
+        {
+            <input id="@inputId" value="@value" @onchange="e => InputValueChanged(objectInstance, property, e, editTemplate)" onblur="this.dispatchEvent(new Event('change'));" class="DateInput @inputsClass @fieldStatusDict[property.Name]?.InputElementClass" autocomplete="off" data-jdp />
+            <span class="invalid-feedback">
+                <i class="fas fa-exclamation-circle"></i>
+                @translator.Translate(fieldStatusDict[property.Name]?.ErrorMessage ?? "")
+            </span>
+            SetDateinputMask(inputId);
+        }
+        else if (property.GetCustomAttribute<TimeAttribute>() is not null)
+        {
+            <input id="@inputId" value="@value" type="time" @onchange="e => InputValueChanged(objectInstance, property, e, editTemplate)" onblur="this.dispatchEvent(new Event('change'));" class="@inputsClass @fieldStatusDict[property.Name]?.InputElementClass" autocomplete="off" />
+            <span class="invalid-feedback">
+                <i class="fas fa-exclamation-circle"></i>
+                @translator.Translate(fieldStatusDict[property.Name]?.ErrorMessage ?? "")
+            </span>
+        }
+        else
+        {
+            var typeCode = Type.GetTypeCode(property.PropertyType);
+            if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                typeCode = Type.GetTypeCode(Nullable.GetUnderlyingType(property.PropertyType));
+            }
+
+            switch (typeCode)
+            {
+                case(TypeCode.String):
+                    var type = editTemplate.IsSecret ? "password" : "text";
+                    <input id="@inputId" type="@type" value="@value" @onchange="e => InputValueChanged(objectInstance, property, e, editTemplate)" class="@inputsClass @fieldStatusDict[property.Name]?.InputElementClass" autocomplete="off" />
+                    break;
+                case (TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 or TypeCode.Decimal or TypeCode.Double):
+                    <input id="@inputId" type="number" value="@value" @onchange="e => InputValueChanged(objectInstance, property, e, editTemplate)" class="@inputsClass @fieldStatusDict[property.Name]?.InputElementClass" />
+                    break;
+                case (TypeCode.Boolean):
+                    bool boolValue;
+                    Boolean.TryParse(value, out boolValue);
+                    <input id="@inputId" type="checkbox" checked="@boolValue" @onchange="e => InputValueChanged(objectInstance, property, e, editTemplate)" class="@checkBoxInputClass @fieldStatusDict[property.Name]?.InputElementClass" />
+                    break;
+            }
+            <span class="invalid-feedback">
+                <i class="fas fa-exclamation-circle"></i>
+                @translator.Translate(fieldStatusDict[property.Name]?.ErrorMessage ?? "")
+            </span>
+        }
+    }
+}

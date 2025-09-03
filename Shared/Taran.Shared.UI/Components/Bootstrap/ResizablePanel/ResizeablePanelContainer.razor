@@ -1,0 +1,105 @@
+﻿<div class="row @Class" @onmousemove=mouseMove @onmouseup=mouseUp>
+    @{
+        var lastPanel = Panels.LastOrDefault();
+        foreach (var panel in Panels)
+        {
+            panel.Render(__builder, !ReferenceEquals(panel, lastPanel));
+        }
+    }
+</div>
+
+<CascadingValue Value=@this>
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    private List<ResizeablePanel> Panels = new();
+
+    private ResizeablePanel? ResizingPanel;
+    private double DragStartedX;
+    private readonly int stepSize = 120;
+
+    public void AddPanel(ResizeablePanel panel)
+    {
+        Panels.Add(panel);
+        StateHasChanged();
+    }
+
+    public void ChangeColumnSize(ResizeablePanel senderPanel, int changeAmount)
+    {
+        if (changeAmount == 0)
+            return;
+
+        if (changeAmount < 0 && senderPanel.GetColumnSize() == senderPanel.MinColumnSize)
+            return;
+
+        if (changeAmount > 1 && senderPanel.GetColumnSize() == 12)
+            return;
+
+        var panelIndex = Panels.IndexOf(senderPanel);
+        ResizeablePanel? nextPanel = null;
+        ResizeablePanel? prevPanel = null;
+
+        for (int i = panelIndex + 1; i < Panels.Count(); i++)
+        {
+            if (Panels[i].GetColumnSize() == Panels[i].MinColumnSize && changeAmount > 0)
+                continue;
+            nextPanel = Panels[i];
+            break;
+        }
+
+        for (int i = panelIndex - 1; i >= 0; i--)
+        {
+            if (Panels[i].GetColumnSize() == Panels[i].MinColumnSize && changeAmount < 0)
+                continue;
+            prevPanel = Panels[i];
+            break;
+        }
+
+        if (changeAmount > 0 && Panels.Count > panelIndex + 1 && nextPanel is null)//if increasing width and resizing column has reached maximum with and there is no next panel to decrease width
+            return;
+
+        senderPanel.AddColumnSize(changeAmount);
+        (nextPanel ?? prevPanel)?.AddColumnSize(-1 * changeAmount);
+
+        StateHasChanged();
+    }
+
+    public void SetResizingPanel(ResizeablePanel? resizeablePanel, double mouseDownX)
+    {
+        if (resizeablePanel is not null)
+            Class += " user-select-none";
+        else
+            Class = Class.Replace(" user-select-none", "");
+
+        ResizingPanel = resizeablePanel;
+        DragStartedX = mouseDownX;
+    }
+
+    private void mouseMove(MouseEventArgs e)
+    {
+        if (ResizingPanel is null)
+            return;
+
+        var xDifference = DragStartedX - e.PageX;
+        if (Math.Abs(xDifference) < stepSize)
+            return;
+
+        int columnSizeChangeAmount = ((int)xDifference / stepSize);
+
+        ChangeColumnSize(ResizingPanel, columnSizeChangeAmount);
+
+        DragStartedX = e.PageX;
+    }
+
+    private void mouseUp(MouseEventArgs e)
+    {
+        ResizingPanel = null;
+    }
+}

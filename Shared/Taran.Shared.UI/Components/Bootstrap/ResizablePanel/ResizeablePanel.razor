@@ -1,0 +1,57 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Rendering
+
+@code {
+    private int _columnSize;
+
+    [Parameter, EditorRequired]
+    [Range(1, 12, ErrorMessage = "Column size must be between 1 and 12")]
+    public int ColumnSize { get; set; }
+
+    [Parameter]
+    public int MinColumnSize { get; set; } = 1;
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter]
+    public ResizeablePanelContainer ResizeablePanelContainer { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _columnSize = ColumnSize;
+        ResizeablePanelContainer.AddPanel(this);
+    }
+
+    public int GetColumnSize() => _columnSize;
+
+    public void AddColumnSize(int amount)
+    {
+        if (_columnSize + amount > 12 || _columnSize + amount < 1)
+            throw new Exception("Invalid column size!");
+
+        _columnSize += amount;
+    }
+
+    public void Render(RenderTreeBuilder __builder, bool renderResizeBorder)
+    {
+        var columnClass = $"col-{_columnSize}";
+        <div class="@columnClass @Class position-relative">
+            @ChildContent
+            @if (renderResizeBorder)
+            {
+                <div class="position-absolute top-0 end-0 h-100 bg-light" style="width:4px; cursor:e-resize"
+                    @onmousedown=resizePanelMouseDown>
+                </div>
+            }
+        </div>
+    }
+
+    public void resizePanelMouseDown(MouseEventArgs e)
+    {
+        ResizeablePanelContainer.SetResizingPanel(this, e.PageX);
+    }
+}

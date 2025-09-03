@@ -1,0 +1,51 @@
+﻿<ul class="nav nav-tabs mb-3">
+    @{
+        foreach (var tab in Tabs)
+        {
+            var _class = "nav-link " + (tab == selectedTab ? "active" : "");
+            <li class="nav-item">
+                <a class="@_class" aria-current="page" href="#" @onclick:preventDefault @onclick="@(async ()=>{ await SelectedTabChanged(tab); })">
+                    @tab.Title
+                </a>
+            </li>
+        }
+    }
+</ul>
+<div class="tab-content">
+    @{
+        foreach (var tab in Tabs)
+        {
+            var _class = "tab-pane " + (tab == selectedTab ? "show active" : "");
+            <div class="@_class" role="tabpanel">
+                @tab.ChildContent
+            </div>
+        }
+    }
+</div>
+
+<CascadingValue Value=@this>
+    @ChildContent
+</CascadingValue>
+
+@code {
+    private BootstrapTab selectedTab;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    private List<BootstrapTab> Tabs = new();
+
+    public void AddTab(BootstrapTab tab)
+    {
+        Tabs.Add(tab);
+        if (Tabs.Count == 1)
+            selectedTab = tab;
+
+        StateHasChanged();
+    }
+
+    protected async Task SelectedTabChanged(BootstrapTab tab)
+    {
+        selectedTab = tab;
+    }
+}

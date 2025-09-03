@@ -1,0 +1,169 @@
+﻿@using Taran.UI.Main.Services.IdentityServices
+@using Microsoft.AspNetCore.Components.Authorization
+@using MudBlazor
+@using Taran.Shared.Dtos.Attributes
+@using Taran.Shared.Dtos.Languages
+@using Taran.Shared.Dtos.Services.Calendar
+@using Taran.Shared.UI.Services
+
+@inherits LayoutComponentBase
+@inject IRoleService roleService
+@inject ICookieStorageService cookieService
+@inject IUserService userService
+
+<MudThemeProvider />
+<MudPopoverProvider />
+
+<AuthorizeView>
+    <Authorized>
+
+        <HeadContent>
+            @if (translator.CurrentLanguage.IsLeftToRight)
+            {
+                <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+            }
+            else
+            {
+                <link rel="stylesheet" href="css/bootstrap/bootstrap.rtl.min.css" />
+            }
+
+            @if (cultureConfiguration.DateTime == "Shamsi")
+            {
+                <link href="persianDatePicker/jalalidatepicker.min.css" rel="stylesheet" />
+            }
+            else
+            {
+                <link rel="stylesheet" href="jquery/jquery-ui.css">
+            }
+        </HeadContent>
+
+        <div class="page">
+            <div id="menuBar" class="sidebar border-end">
+                <span class="position-absolute end-0 p-3 text-white" style="z-index:10;" role="button" onclick="toggleMenuBar();">
+                    <i class="fas fa-times fa-fw"></i>
+                </span>
+                <NavMenu @ref=navMenu />
+            </div>
+
+            <main>
+                <div class="top-row px-4 pt-2">
+                    <span id="restoreMenuButton" class="btn btn-sm border border-1 position-absolute start-0 bg-dark m-1 p-2 pb-1 text-white d-none" style="z-index:10;" role="button" onclick="toggleMenuBar();">
+                        <i class="fas fa-bars"></i>
+                    </span>
+                    <h5 id="companyNameLable">
+                        @KeyWords.CompanyName
+                    </h5>
+
+                    <div id="profileToggleIcon" onclick="toggleProfileContextMenu();" class="position-absolute end-0 top-0 border-1 border m-1 p-2 pb-0" role="button">
+                        <i class="fas fa-user h5 text-primary"></i>
+                        <ul id="profileContextMenu" class="d-none position-absolute end-0 top-0 m-4 border border-1 text-decoration-none list-unstyled p-1 bg-light">
+                            <img class="rounded" width="50px" height="50px"/>
+                            <hr class="m-2" />
+                            <li>
+                                <a onclick="return confirm('@translator.Translate(nameof(KeyWords.DoYouWantToLogOut))');" href="@(navConfig.AuthApi + $"/auth/logout?backUrl={navConfig.UI}/login")">
+                                    @translator.Translate(nameof(KeyWords.LogOut))
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <article class="content px-4 position-relative overflow-auto" style="height:calc(100vh - 56px);">
+                    @if (Initialized)
+                    {
+                        @Body
+                    }
+                </article>
+            </main>
+        </div>
+
+        <div id="blazor-error-ui">
+            @translator.Translate(nameof(KeyWords.UnhandledErrorOccured))
+            <a href="" class="reload">Reload</a>
+            <a class="dismiss">🗙</a>
+        </div>
+
+        <script>
+            var menuIsHidden = false;
+            var profileContextMenuIsHidden = true;
+
+            function toggleMenuBar() {
+                companyNameLablePaddingClass = "ps-4";
+                if (menuIsHidden) {
+                    $('#menuBar').css('display', 'block');
+                    $('#restoreMenuButton').addClass('d-none');
+                    $('#companyNameLable').removeClass(companyNameLablePaddingClass);
+                }
+                else {
+                    $('#menuBar').css('display', 'none');
+                    $('#restoreMenuButton').removeClass('d-none');
+                    $('#companyNameLable').addClass(companyNameLablePaddingClass);
+                }
+
+                menuIsHidden = !menuIsHidden;
+            }
+
+            function toggleProfileContextMenu() { 
+                if (profileContextMenuIsHidden) {
+                    $("#profileContextMenu").removeClass("d-none");
+                }
+                else {
+                    $("#profileContextMenu").addClass("d-none");
+                }
+
+                profileContextMenuIsHidden = !profileContextMenuIsHidden;
+            }
+
+            $(document).ready(function () {
+                $(document).click(function (event) {
+                    if ($(event.target).closest('#profileToggleIcon').length === 0) {
+                        $("#profileContextMenu").addClass("d-none");
+                        profileContextMenuIsHidden = true;
+                    }
+                });
+            });
+        </script>
+
+    </Authorized>
+    <NotAuthorized>
+
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    private bool Initialized;
+    private NavMenu navMenu;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authStatus = await authStateProvider.GetAuthenticationStateAsync();
+        if (authStatus?.User?.Identity?.IsAuthenticated == false)
+            navigationManager.NavigateTo("/login", true);
+
+        if (!translator.CurrentLanguage.IsLeftToRight)
+            await jsRuntime.InvokeVoidAsync("eval", "document.documentElement.classList.add('rtl')");
+
+        if (cultureConfiguration.DateTime == "Shamsi")
+            DateAttribute.Calendar = new PersianCalendar();
+        else
+            DateAttribute.Calendar = new GeorgianCalendar();
+
+        if (await roleService.RefreshAccesses())
+            navMenu.Refresh();
+
+        await base.OnInitializedAsync();
+
+        Initialized = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(!firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            await jsRuntime.InvokeVoidAsync("setDateTimeKind", cultureConfiguration.DateTime);
+            await jsRuntime.InvokeVoidAsync("initDatePickers", "DateInput");
+        }
+    }
+}

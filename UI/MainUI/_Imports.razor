@@ -1,0 +1,26 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.Extensions.Options
+@using Microsoft.JSInterop
+@using Taran.Shared.Dtos.ConfigurationModels
+@using Taran.Shared.Dtos.Services.Calendar
+@using Taran.Shared.UI.Auth
+@using Taran.Shared.UI.ConfigurationModels
+@using Taran.Shared.UI.Languages
+@using Taran.Shared.UI.Services
+@using Taran.Shared.UI.Services.HttpService
+
+@inject AuthStateProvider authStateProvider
+@inject NavigationConfiguration navConfig
+@inject NavigationManager navigationManager
+@inject IHttpService httpService
+@inject IJSRuntime jsRuntime
+@inject ITranslator translator
+@inject ICalendar calendar
+@inject IToastService toastService
+@inject CultureConfiguration cultureConfiguration

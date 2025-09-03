@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Services\TEST.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\en-US.yml" />
+    <None Remove="Resources\fa-IR.yml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\fa-IR.yml" />
+    <EmbeddedResource Include="Resources\en-US.yml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.7" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="MudBlazor" Version="7.15.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\appsettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\appsettings.Production.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\css\bootstrap\bootstrap.bundle.min.js" />
+    <None Include="wwwroot\css\bootstrap\bootstrap.min.css.map" />
+    <None Include="wwwroot\css\font-awesome\fa.min.js" />
+    <None Include="wwwroot\datePicker\datePickerInitializer.js" />
+    <None Include="wwwroot\images\login_bg.webp" />
+    <None Include="wwwroot\jquery\jquery-ui.js" />
+    <None Include="wwwroot\jquery\jquery.js" />
+    <None Include="wwwroot\jquery\jquery.min.js" />
+    <None Include="wwwroot\jquery\jquery.min.map" />
+    <None Include="wwwroot\persianDatePicker\jalalidatepicker.min.js" />
+    <None Include="wwwroot\selectize\init.js" />
+    <None Include="wwwroot\selectize\Selectize.js" />
+    <None Include="wwwroot\selectize\selectize.rar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Services\TEST.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Services\TEST.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Identity\Taran.Identity.Access\Taran.Identity.Access.csproj" />
+    <ProjectReference Include="..\..\Identity\Taran.Identity.Dtos\Taran.Identity.Dtos.csproj" />
+    <ProjectReference Include="..\..\Shared\Taran.Shared.Dto\Taran.Shared.Dtos.csproj" />
+    <ProjectReference Include="..\..\Shared\Taran.Shared.UI\Taran.Shared.UI.csproj" />
+  </ItemGroup>
+
+</Project>
