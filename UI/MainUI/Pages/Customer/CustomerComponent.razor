@@ -1,0 +1,92 @@
+﻿@page "/customer"
+
+@using SabaRayane.Contract.Dtos.s.Customers
+@using Taran.Shared.Dtos.Languages
+@using Taran.Shared.UI.Components.CustomizedQuickGrid
+@using Taran.Shared.UI.Components.CustomizedQuickGrid.Columns
+@using Taran.UI.Main.Services.CustomerServices
+
+@inject ICustomerService customerService;
+
+<QuickGrid Id="CustomerGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchCustomerResponseDto" Pagination="@pagination" @ref="grid" OnSaveEdit="SaveInlineEdit" EditingObjectType="typeof(UpdateCustomerRequestDto)" OnSaveNew="SaveInlineCreate" CreatingObjectType="typeof(CreateCustomerRequestDto)" OnDelete="OnItemDelete" Class="table table-borderless" Theme="none">
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.CustomerId))" Property="@(c => c.CustomerId)"
+            EditTemplate="new EditTemplate(nameof(SearchCustomerResponseDto.CustomerId))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.FirstName))" Property="@(c => c.FirstName)"
+            EditTemplate="new EditTemplate(nameof(SearchCustomerResponseDto.FirstName))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.LastName))" Property="@(c => c.LastName)"
+            EditTemplate="new EditTemplate(nameof(SearchCustomerResponseDto.LastName))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.StoreName))" Property="@(c => c.StoreName)"
+            EditTemplate="new EditTemplate(nameof(SearchCustomerResponseDto.StoreName))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.MobileNumber))" Property="@(c => c.MobileNumber)"
+            EditTemplate="new EditTemplate(nameof(SearchCustomerResponseDto.MobileNumber))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Description))" Property="@(c => c.Description)"
+            EditTemplate="new EditTemplate(nameof(SearchCustomerResponseDto.Description))">
+    </PropertyColumn>
+</QuickGrid>
+
+<div class="row bg-default">
+    <div class="col-8">
+        <Paginator State="@pagination" />
+    </div>
+    <div class="col-4">
+        <div class="d-inline float-end me-5">
+            @translator.Translate(nameof(KeyWords.ItemsPerPage))
+            <select @bind="@pagination.ItemsPerPage">
+                <option>10</option>
+                <option>15</option>
+                <option>20</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+@code {
+    QuickGrid<SearchCustomerResponseDto>? grid;
+    GridItemsProvider<SearchCustomerResponseDto>? GridItemsProvider;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    SearchCustomerRequestDto searchRequest = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        GridItemsProvider = async req =>
+        {
+            searchRequest.Skip = req.StartIndex;
+            searchRequest.Take = req.Count ?? 10;
+
+            var customersResponse = await customerService.SearchCustomer(searchRequest);
+
+            return GridItemsProviderResult.From(
+                items: customersResponse.Data!.Results,
+                totalItemCount: customersResponse.Data.TotalCount);
+        };
+    }
+
+    protected async Task FilterChanged()
+    {
+        await grid!.RefreshDataAsync();
+    }
+
+    protected async Task<GridItemEditResult> OnItemDelete(SearchCustomerResponseDto item)
+    {
+        var result = await customerService.DeleteCustomer(item.Id);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+
+    protected async Task<GridItemEditResult> SaveInlineEdit(object updateRequestDto)
+    {
+        var result = await customerService.UpdateCustomer((UpdateCustomerRequestDto)updateRequestDto);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+
+    protected async Task<GridItemEditResult> SaveInlineCreate(object createRequestDto)
+    {
+        var request = (CreateCustomerRequestDto)createRequestDto;
+        var result = await customerService.CreateCustomer(request);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+}

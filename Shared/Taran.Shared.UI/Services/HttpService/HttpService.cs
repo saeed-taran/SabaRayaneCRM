@@ -83,7 +83,7 @@ public class HttpService : IHttpService
         }
         catch (HttpRequestException e) 
         {
-            _navigationManager.NavigateTo(_navConfig.UI + "/login", true);
+            //_navigationManager.NavigateTo(_navConfig.UI + "/login", true);
             return new BackendResponse<Response>(false, "", default);
         }
     }

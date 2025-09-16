@@ -15,23 +15,43 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <div class="accordion accordion-flush" id="accordionFlushExample">
+
         <div class="accordion-item">
-            <h2 class="accordion-header" id="CurrencyMenu">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false">
-                    <span class="bi fas fa-money-bill-wave" aria-hidden="true"></span>
-                    @translator.Translate(nameof(KeyWords.IdentityManagement))
+            <h2 class="accordion-header" id="CustomerMenu">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-Customer" aria-expanded="false">
+                    <MudBlazor.MudIcon Icon="@MudBlazor.Icons.Material.Filled.Group"></MudBlazor.MudIcon>
+                    @translator.Translate(nameof(KeyWords.Customers))
                 </button>
             </h2>
-            <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="CurrencyMenu" data-bs-parent="#accordionFlushExample">
+            <div id="flush-Customer" class="accordion-collapse collapse" aria-labelledby="CustomerMenu" data-bs-parent="#accordionFlushExample">
                 <div class="accordion-body ps-0 pe-0">
                     <div class="nav-item px-3">
-                        <Link CssClass="nav-link" Enabled="@roleService.HaveAccess(AccessNames.User_Get)" Href="currency">
-                            <span class="bi fas fa-money-bill-wave" aria-hidden="true"></span> @translator.Translate(nameof(KeyWords.User))
+                        <Link CssClass="nav-link" Enabled="@roleService.HaveAccess(AccessNames.Customer_Get)" Href="customer">
+                        <MudBlazor.MudIcon Icon="@MudBlazor.Icons.Material.Filled.Group"></MudBlazor.MudIcon> @translator.Translate(nameof(KeyWords.Customers))
                         </Link>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="ProductMenu">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-Products" aria-expanded="false">
+                    <MudBlazor.MudIcon Icon="@MudBlazor.Icons.Material.Filled.Memory"></MudBlazor.MudIcon>
+                    @translator.Translate(nameof(KeyWords.Products))
+                </button>
+            </h2>
+            <div id="flush-Products" class="accordion-collapse collapse" aria-labelledby="ProductMenu" data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body ps-0 pe-0">
+                    <div class="nav-item px-3">
+                        <Link CssClass="nav-link" Enabled="@roleService.HaveAccess(AccessNames.Product_Get)" Href="product">
+                        <MudBlazor.MudIcon Icon="@MudBlazor.Icons.Material.Filled.Memory"></MudBlazor.MudIcon> @translator.Translate(nameof(KeyWords.Products))
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 

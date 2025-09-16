@@ -25,5 +25,20 @@ public enum KeyWords
     IdentityManagement,
     UnhandledErrorOccured,
     DoYouWantToLogOut,
-    LogOut
+    LogOut,
+    CustomerId,
+    FirstName,
+    LastName,
+    StoreName,
+    MobileNumber,
+    Description,
+    ItemsPerPage,
+    UserName,
+    Password,
+    Login,
+    Contracts,
+    Customers,
+    Name,
+    Price,
+    Products
 }

@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using ShakaSystem.Infrastructure;
 using Taran.Identity.Application.Commands.Roles;
 using Taran.Infrastructure;
 using Taran.Shared.Api;
-using Taran.Shared.Infrastructure.Repositories;
 using Taran.Shared.Core.Repository;
+using Taran.Shared.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,12 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 /*************Registering Services*/
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    SeedData.Initialize(services);
+}
 
 app.AddExceptionHandler();
 

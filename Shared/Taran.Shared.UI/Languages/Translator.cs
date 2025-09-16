@@ -23,6 +23,9 @@ public class Translator : ITranslator
 
     public string Translate(string keyWord)
     {
+        if (string.IsNullOrWhiteSpace(keyWord))
+            return keyWord;
+
         return languageService.Keys[keyWord];
     }
 }

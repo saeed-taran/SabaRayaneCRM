@@ -1,0 +1,6 @@
+@SabaRayane.Contract.Api_HostAddress = http://localhost:5258
+
+GET {{SabaRayane.Contract.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

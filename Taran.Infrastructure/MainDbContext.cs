@@ -23,6 +23,7 @@ public partial class MainDbContext : DbContext
             fk.DeleteBehavior = DeleteBehavior.Restrict;
 
         IdentityOnModelCreating(modelBuilder, "identity");
+        ContractOnModelCreating(modelBuilder, "contract");
     }
 
     public override int SaveChanges()

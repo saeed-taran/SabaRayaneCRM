@@ -1,0 +1,85 @@
+﻿@page "/product"
+
+@using SabaRayane.Contract.Dtos.s.Products
+@using Taran.Shared.Dtos.Languages
+@using Taran.Shared.UI.Components.CustomizedQuickGrid
+@using Taran.Shared.UI.Components.CustomizedQuickGrid.Columns
+@using Taran.UI.Main.Services.ProductServices
+@inject IProductService productService;
+
+<QuickGrid Id="ProductGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchProductResponseDto" Pagination="@pagination" @ref="grid" OnSaveEdit="SaveInlineEdit" EditingObjectType="typeof(UpdateProductRequestDto)" OnSaveNew="SaveInlineCreate" CreatingObjectType="typeof(CreateProductRequestDto)" OnDelete="OnItemDelete" Class="table table-borderless" Theme="none">
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Name))" Property="@(c => c.Name)"
+            EditTemplate="new EditTemplate(nameof(SearchProductResponseDto.Name))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Price))" Property="@(c => c.Price)"
+            EditTemplate="new EditTemplate(nameof(SearchProductResponseDto.Price))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Description))" Property="@(c => c.Description)"
+            EditTemplate="new EditTemplate(nameof(SearchProductResponseDto.Description))">
+    </PropertyColumn>
+</QuickGrid>
+
+<div class="row bg-default">
+    <div class="col-8">
+        <Paginator State="@pagination" />
+    </div>
+    <div class="col-4">
+        <div class="d-inline float-end me-5">
+            @translator.Translate(nameof(KeyWords.ItemsPerPage))
+            <select @bind="@pagination.ItemsPerPage">
+                <option>10</option>
+                <option>15</option>
+                <option>20</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+@code {
+    QuickGrid<SearchProductResponseDto>? grid;
+    GridItemsProvider<SearchProductResponseDto>? GridItemsProvider;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    SearchProductRequestDto searchRequest = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+
+        GridItemsProvider = async req =>
+        {
+            searchRequest.Skip = req.StartIndex;
+            searchRequest.Take = req.Count ?? 10;
+
+            var productsResponse = await productService.SearchProduct(searchRequest);
+
+            return GridItemsProviderResult.From(
+                items: productsResponse.Data!.Results,
+                totalItemCount: productsResponse.Data.TotalCount);
+        };
+    }
+
+    protected async Task FilterChanged()
+    {
+        await grid!.RefreshDataAsync();
+    }
+
+    protected async Task<GridItemEditResult> OnItemDelete(SearchProductResponseDto item)
+    {
+        var result = await productService.DeleteProduct(item.Id);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+
+    protected async Task<GridItemEditResult> SaveInlineEdit(object updateRequestDto)
+    {
+        var result = await productService.UpdateProduct((UpdateProductRequestDto)updateRequestDto);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+
+    protected async Task<GridItemEditResult> SaveInlineCreate(object createRequestDto)
+    {
+        var request = (CreateProductRequestDto)createRequestDto;
+        var result = await productService.CreateProduct(request);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+}
+
