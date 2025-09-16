@@ -115,7 +115,7 @@ namespace Taran.Infrastructure.Migrations
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<long>(type: "bigint", nullable: false),
-                    ContractDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    AgreementDate = table.Column<DateOnly>(type: "date", nullable: false),
                     DurationInMonths = table.Column<int>(type: "int", nullable: false),
                     ExtraUsersCount = table.Column<int>(type: "int", nullable: false),
                     CreatorUserId = table.Column<int>(type: "int", nullable: false),

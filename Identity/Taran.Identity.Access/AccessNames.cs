@@ -22,4 +22,9 @@ public enum AccessNames
     Product_Create = 13,
     Product_Update = 14,
     Product_Delete = 15,
+    
+    Agreement_Get = 16,
+    Agreement_Create = 17,
+    Agreement_Update = 18,
+    Agreement_Delete = 19,
 }

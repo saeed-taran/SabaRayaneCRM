@@ -7,6 +7,6 @@ public class LoadCustomerByIdSpecification : SpecificationBase<Customer>
 {
     public LoadCustomerByIdSpecification(int id) : base(c => c.Id == id)
     {
-        AddInclude(q => q.Include(c => c.Contracts));
+        AddInclude(q => q.Include(c => c.Agreements));
     }
 }

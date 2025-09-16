@@ -4,7 +4,7 @@ using Taran.Shared.Core.Exceptions;
 
 namespace SabaRayane.Contract.Core.Aggregates.CustomerAggregate;
 
-public class Contract : BaseEntity<int>
+public class Agreement : BaseEntity<int>
 {
     public int CustomerId { get; private set; }
     public Customer Customer { get; private set; }
@@ -14,19 +14,29 @@ public class Contract : BaseEntity<int>
 
     public long Price { get; private set; }
 
-    public DateOnly ContractDate { get; private set; }
+    public DateOnly AgreementDate { get; private set; }
 
     public int DurationInMonths { get; private set; }
 
     public int ExtraUsersCount { get; private set; }
 
-    internal Contract(int creatorUserId, int productId, long price, DateOnly contractDate, int durationInMonths, int extraUsersCount)
+    internal Agreement(int creatorUserId, int productId, long price, DateOnly agreementDate, int durationInMonths, int extraUsersCount)
         : base(creatorUserId)
     {
         ProductId = productId;
         Price = price > 0 ? price : throw new DomainInvalidArgumentException(nameof(Price));
-        ContractDate = contractDate;
+        AgreementDate = agreementDate;
         DurationInMonths = durationInMonths > 0 ? durationInMonths : throw new DomainInvalidArgumentException(nameof(DurationInMonths));
         ExtraUsersCount = extraUsersCount >= 0 ? extraUsersCount : throw new DomainInvalidArgumentException(nameof(ExtraUsersCount));
+    }
+
+    public void Update(int userId, int productId, DateOnly agreementDate, int durationInMonths, int extraUsersCount) 
+    {
+        ProductId = productId;
+        AgreementDate = agreementDate;
+        DurationInMonths = durationInMonths > 0 ? durationInMonths : throw new DomainInvalidArgumentException(nameof(DurationInMonths));
+        ExtraUsersCount = extraUsersCount >= 0 ? extraUsersCount : throw new DomainInvalidArgumentException(nameof(ExtraUsersCount));
+
+        Update(userId);
     }
 }

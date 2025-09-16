@@ -33,7 +33,7 @@ namespace Taran.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly>("ContractDate")
+                    b.Property<DateOnly>("AgreementDate")
                         .HasColumnType("date");
 
                     b.Property<DateTime>("CreationDate")

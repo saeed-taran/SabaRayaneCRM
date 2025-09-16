@@ -30,6 +30,11 @@
                         <MudBlazor.MudIcon Icon="@MudBlazor.Icons.Material.Filled.Group"></MudBlazor.MudIcon> @translator.Translate(nameof(KeyWords.Customers))
                         </Link>
                     </div>
+                    <div class="nav-item px-3">
+                        <Link CssClass="nav-link" Enabled="@roleService.HaveAccess(AccessNames.Agreement_Get)" Href="agreement">
+                        <MudBlazor.MudIcon Icon="@MudBlazor.Icons.Material.Filled.ReceiptLong"></MudBlazor.MudIcon> @translator.Translate(nameof(KeyWords.Agreement))
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

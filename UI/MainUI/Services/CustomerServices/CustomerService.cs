@@ -1,4 +1,5 @@
-﻿using SabaRayane.Contract.Dtos.s.Customers;
+﻿using SabaRayane.Contract.Dtos.Customers.Agreements;
+using SabaRayane.Contract.Dtos.s.Customers;
 using Taran.Shared.Dtos;
 using Taran.Shared.Dtos.WrappedResponse;
 using Taran.Shared.UI.ConfigurationModels;
@@ -15,7 +16,6 @@ namespace Taran.UI.Main.Services.CustomerServices
         {
 
         }
-
 
         #region Customer services
         public async Task<BackendResponse<PaginatedResponseDto<SearchCustomerResponseDto>>> SearchCustomer(SearchCustomerRequestDto searchRequest)
@@ -56,5 +56,37 @@ namespace Taran.UI.Main.Services.CustomerServices
         }
         #endregion
 
+        #region Agreement services
+        public async Task<BackendResponse<PaginatedResponseDto<SearchAgreementResponseDto>>> SearchAgreement(SearchAgreementRequestDto searchRequest)
+        {
+            return await httpService.Get<SearchAgreementRequestDto, PaginatedResponseDto<SearchAgreementResponseDto>>(
+                baseUrl + "/Agreement",
+                searchRequest
+            );
+        }
+
+        public async Task<BackendResponse<bool?>> CreateAgreement(CreateAgreementRequestDto createRequestDto)
+        {
+            return await httpService.Post<CreateAgreementRequestDto, bool?>(
+                baseUrl + "/Agreement",
+                createRequestDto
+            );
+        }
+
+        public async Task<BackendResponse<bool?>> UpdateAgreement(UpdateAgreementRequestDto updateRequestDto)
+        {
+            return await httpService.Put<UpdateAgreementRequestDto, bool?>(
+                baseUrl + "/Agreement",
+                updateRequestDto
+            );
+        }
+
+        public async Task<BackendResponse<bool?>> DeleteAgreement(int id)
+        {
+            return await httpService.Delete<bool?>(
+                baseUrl + "/Agreement" + $"/{id}"
+            );
+        }
+        #endregion
     }
 }

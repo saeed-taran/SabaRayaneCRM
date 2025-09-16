@@ -4,6 +4,7 @@ using Taran.Shared.Api;
 using Taran.Shared.Infrastructure.Repositories;
 using Taran.Shared.Core.Repository;
 using SabaRayane.Contract.Application.Commands.s.Customers;
+using Taran.Shared.Dtos.Services.Calendar;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,7 @@ builder.Services.AddScoped<DbContext, MainDbContext>();
 builder.Services.AddScoped(typeof(IGenericReadRepository<,>), typeof(GenericReadRepository<,>));
 builder.Services.AddScoped(typeof(IGenericWriteRepository<,>), typeof(GenericWriteRepository<,>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ICalendar, PersianCalendar>();
 /*************Registering Services*/
 
 var app = builder.Build();

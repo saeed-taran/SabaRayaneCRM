@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SabaRayane.Contract.Application.Commands.Customers.Agreements;
 using SabaRayane.Contract.Application.Commands.s.Customers;
+using SabaRayane.Contract.Application.Queries.Customers.Agreements;
 using SabaRayane.Contract.Application.Queries.s.Customers;
 using Taran.Identity.Access;
 using Taran.Shared.Api.Attributes;
@@ -51,6 +53,36 @@ namespace SabaRayane.Contract.Api.Controllers
         public async Task<ActionResult> Delete([FromRoute] DeleteCustomerCommand deleteCustomerCommand)
         {
             return Ok(await SendCommand(deleteCustomerCommand));
+        }
+        #endregion
+
+        #region Agreement actions
+        [HttpGet("Agreement")]
+        [CustomeAuthorize((int)AccessNames.Agreement_Get)]
+        public async Task<ActionResult> Get([FromQuery] SearchAgreementQuery searchAgreementQuery)
+        {
+            return Ok(await SendQuery(searchAgreementQuery));
+        }
+
+        [HttpPost("Agreement")]
+        [CustomeAuthorize((int)AccessNames.Agreement_Create)]
+        public async Task<ActionResult> Create([FromBody] CreateAgreementCommand createAgreementCommand)
+        {
+            return Ok(await SendCommand(createAgreementCommand));
+        }
+
+        [HttpPut("Agreement")]
+        [CustomeAuthorize((int)AccessNames.Agreement_Update)]
+        public async Task<ActionResult> Update([FromBody] UpdateAgreementCommand updateAgreementCommand)
+        {
+            return Ok(await SendCommand(updateAgreementCommand));
+        }
+
+        [HttpDelete("Agreement/{Id}")]
+        [CustomeAuthorize((int)AccessNames.Agreement_Delete)]
+        public async Task<ActionResult> Delete([FromRoute] DeleteAgreementCommand deleteAgreementCommand)
+        {
+            return Ok(await SendCommand(deleteAgreementCommand));
         }
         #endregion
 

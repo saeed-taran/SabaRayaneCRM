@@ -1,0 +1,100 @@
+﻿@page "/agreement"
+
+@using SabaRayane.Contract.Dtos.Customers.Agreements
+@using Taran.Shared.Dtos.Languages
+@using Taran.Shared.UI.Components.CustomizedQuickGrid
+@using Taran.Shared.UI.Components.CustomizedQuickGrid.Columns
+@using Taran.UI.Main.Services.CustomerServices
+
+@inject ICustomerService customerService;
+
+<QuickGrid Id="AgreementGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchAgreementResponseDto" Pagination="@pagination" @ref="grid" OnSaveEdit="SaveInlineEdit" EditingObjectType="typeof(UpdateAgreementRequestDto)" OnSaveNew="SaveInlineCreate" CreatingObjectType="typeof(CreateAgreementRequestDto)" OnDelete="OnItemDelete" Class="table table-borderless" Theme="none">
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.CustomerId))" Property="@(c => c.CustomerId)"
+            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.CustomerId))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Customer))" Property="@(c => c.CustomerName)"
+            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.CustomerId))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Product))" Property="@(c => c.ProductName)"
+            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.ProductId))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Price))" Property="@(c => c.Price)"
+            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.Price))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.AgreementDate))" Property="@(c => c.AgreementDate)"
+            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.AgreementDate))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.DurationInMonths))" Property="@(c => c.DurationInMonths)"
+            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.DurationInMonths))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.ExtraUsersCount))" Property="@(c => c.ExtraUsersCount)"
+            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.ExtraUsersCount))">
+    </PropertyColumn>
+</QuickGrid>
+
+<div class="row bg-default">
+    <div class="col-8">
+        <Paginator State="@pagination" />
+    </div>
+    <div class="col-4">
+        <div class="d-inline float-end me-5">
+            @translator.Translate(nameof(KeyWords.ItemsPerPage))
+            <select @bind="@pagination.ItemsPerPage">
+                <option>10</option>
+                <option>15</option>
+                <option>20</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    QuickGrid<SearchAgreementResponseDto>? grid;
+    GridItemsProvider<SearchAgreementResponseDto>? GridItemsProvider;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    SearchAgreementRequestDto searchRequest = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+
+        GridItemsProvider = async req =>
+        {
+            searchRequest.Skip = req.StartIndex;
+            searchRequest.Take = req.Count ?? 10;
+
+            var customersResponse = await customerService.SearchAgreement(searchRequest);
+
+            return GridItemsProviderResult.From(
+                items: customersResponse.Data!.Results,
+                totalItemCount: customersResponse.Data.TotalCount);
+        };
+    }
+
+    protected async Task FilterChanged()
+    {
+        await grid!.RefreshDataAsync();
+    }
+
+    protected async Task<GridItemEditResult> OnItemDelete(SearchAgreementResponseDto item)
+    {
+        var result = await customerService.DeleteAgreement(item.Id);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+
+    protected async Task<GridItemEditResult> SaveInlineEdit(object updateRequestDto)
+    {
+        var result = await customerService.UpdateAgreement((UpdateAgreementRequestDto)updateRequestDto);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+
+    protected async Task<GridItemEditResult> SaveInlineCreate(object createRequestDto)
+    {
+        var request = (CreateAgreementRequestDto)createRequestDto;
+        var result = await customerService.CreateAgreement(request);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+}
+

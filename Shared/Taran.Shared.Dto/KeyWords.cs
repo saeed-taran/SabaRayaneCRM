@@ -40,5 +40,11 @@ public enum KeyWords
     Customers,
     Name,
     Price,
-    Products
+    Products,
+    Customer,
+    Product,
+    AgreementDate,
+    DurationInMonths,
+    ExtraUsersCount,
+    Agreement
 }
