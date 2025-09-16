@@ -5,30 +5,29 @@
 @using Taran.Shared.UI.Components.CustomizedQuickGrid
 @using Taran.Shared.UI.Components.CustomizedQuickGrid.Columns
 @using Taran.UI.Main.Services.CustomerServices
+@using Taran.UI.Main.Services.ProductServices
 
 @inject ICustomerService customerService;
+@inject IProductService productService;
 
 <QuickGrid Id="AgreementGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchAgreementResponseDto" Pagination="@pagination" @ref="grid" OnSaveEdit="SaveInlineEdit" EditingObjectType="typeof(UpdateAgreementRequestDto)" OnSaveNew="SaveInlineCreate" CreatingObjectType="typeof(CreateAgreementRequestDto)" OnDelete="OnItemDelete" Class="table table-borderless" Theme="none">
-    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.CustomerId))" Property="@(c => c.CustomerId)"
-            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.CustomerId))">
-    </PropertyColumn>
-    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Customer))" Property="@(c => c.CustomerName)"
-            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.CustomerId))">
-    </PropertyColumn>
-    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Product))" Property="@(c => c.ProductName)"
-            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.ProductId))">
-    </PropertyColumn>
     <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Price))" Property="@(c => c.Price)"
-            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.Price))">
+                    EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.Price))">
     </PropertyColumn>
     <PropertyColumn Title="@translator.Translate(nameof(KeyWords.AgreementDate))" Property="@(c => c.AgreementDate)"
-            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.AgreementDate))">
+                    EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.AgreementDate))">
     </PropertyColumn>
     <PropertyColumn Title="@translator.Translate(nameof(KeyWords.DurationInMonths))" Property="@(c => c.DurationInMonths)"
-            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.DurationInMonths))">
+                    EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.DurationInMonths))">
     </PropertyColumn>
     <PropertyColumn Title="@translator.Translate(nameof(KeyWords.ExtraUsersCount))" Property="@(c => c.ExtraUsersCount)"
-            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.ExtraUsersCount))">
+                    EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.ExtraUsersCount))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Product))" Property="@(c => c.ProductName)"
+                    EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.ProductId), ProductDropDownItems)">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Customer))" Property="@(c => c.CustomerName)"
+                    EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.CustomerId), CustomerDropDownItems)">
     </PropertyColumn>
 </QuickGrid>
 
@@ -56,9 +55,15 @@
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
     SearchAgreementRequestDto searchRequest = new();
 
+    List<(int, string)> ProductDropDownItems = new();
+    List<(int, string)> CustomerDropDownItems = new();
+
+
     protected override async Task OnInitializedAsync()
     {
-        
+        ProductDropDownItems = await productService.GetProductDropDownItems(0, 1000, "");
+        CustomerDropDownItems = await customerService.GetCustomerDropDownItems(0, 1000, "");
+
 
         GridItemsProvider = async req =>
         {

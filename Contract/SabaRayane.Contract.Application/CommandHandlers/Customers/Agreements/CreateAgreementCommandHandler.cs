@@ -6,6 +6,7 @@ using SabaRayane.Contract.Core.Aggregates.CustomerAggregate;
 using SabaRayane.Contract.Core.Specifications.s.Customers;
 using Taran.Shared.Core.Exceptions;
 using SabaRayane.Contract.Core.Aggregates.ProductAggregate;
+using Taran.Shared.Dtos.Services.Calendar;
 
 namespace SabaRayane.Contract.Application.CommandHandlers.Customers.Agreements;
 public class CreateAgreementCommandHandler : IRequestHandler<CreateAgreementCommand, bool>
@@ -14,13 +15,15 @@ public class CreateAgreementCommandHandler : IRequestHandler<CreateAgreementComm
     private readonly IGenericReadRepository<Agreement, int> agreementReadRepository;
     private readonly IGenericReadRepository<Product, int> productReadRepository;
     private readonly IUnitOfWork unitOfWork;
+    private readonly ICalendar calendar;
 
-    public CreateAgreementCommandHandler(IGenericWriteRepository<Customer, int> customerWriteRepository, IGenericReadRepository<Agreement, int> agreementReadRepository, IUnitOfWork unitOfWork, IGenericReadRepository<Product, int> productReadRepository)
+    public CreateAgreementCommandHandler(IGenericWriteRepository<Customer, int> customerWriteRepository, IGenericReadRepository<Agreement, int> agreementReadRepository, IUnitOfWork unitOfWork, IGenericReadRepository<Product, int> productReadRepository, ICalendar calendar)
     {
         this.customerWriteRepository = customerWriteRepository;
         this.agreementReadRepository = agreementReadRepository;
         this.unitOfWork = unitOfWork;
         this.productReadRepository = productReadRepository;
+        this.calendar = calendar;
     }
 
     public async Task<bool> Handle(CreateAgreementCommand request, CancellationToken cancellationToken)
@@ -32,7 +35,7 @@ public class CreateAgreementCommandHandler : IRequestHandler<CreateAgreementComm
         var product = await productReadRepository.GetByIdAsync(request.ProductId)
             ?? throw new DomainEntityNotFoundException(nameof(Product));
 
-        loadedCustomer.AddAgreement(request.GetUserId(), request.ProductId, product.Price, DateOnly.Parse(request.AgreementDate), request.DurationInMonths, request.ExtraUsersCount);
+        loadedCustomer.AddAgreement(request.GetUserId(), request.ProductId, product.Price, calendar.ConvertToDateOnly(request.AgreementDate), request.DurationInMonths, request.ExtraUsersCount);
 
         await unitOfWork.SaveChangesAsync();
         return true;

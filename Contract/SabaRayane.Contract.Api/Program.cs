@@ -31,12 +31,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenWithAuthorize();
 
+builder.Services.InitCalendar(configuration);
+
 /*Registering Services*/
 builder.Services.AddScoped<DbContext, MainDbContext>();
 builder.Services.AddScoped(typeof(IGenericReadRepository<,>), typeof(GenericReadRepository<,>));
 builder.Services.AddScoped(typeof(IGenericWriteRepository<,>), typeof(GenericWriteRepository<,>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ICalendar, PersianCalendar>();
 /*************Registering Services*/
 
 var app = builder.Build();
