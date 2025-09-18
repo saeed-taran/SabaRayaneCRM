@@ -1,4 +1,4 @@
-html, body {
+﻿html, body {
     font-family: IRANSans !important;/*'Helvetica Neue', Helvetica, Arial, sans-serif;*/
     font-size:14px;
 }
@@ -8,6 +8,11 @@ html, body {
 }
 .ltr {
     direction: ltr;
+}
+
+.shakaBg {
+    background: url('../images/Shaka/Shaka_1.jpg') no-repeat center center;
+    background-size: cover;
 }
 
 h1:focus {
@@ -37,19 +42,17 @@ a, .btn-link {
     margin-right: -5px !important;
 }
 .quickgrid thead {
-    background-color: rgb(165,42,42) !important;
+    background-color: rgb(21,31,56) !important;
     color: white;
 }
     .quickgrid thead input {
         opacity:0.8;
     }
 .quickgrid .headerOptions {
-    background-color: rgb(185 102 102) !important;
+    background-color: rgb(192,166,107) !important;
 }
 
 .quickgrid th {
-    max-width: 120px;
-    min-width: 120px;
     width: 120px;
 }
 
@@ -159,7 +162,7 @@ code {
 }
 
 .company-brand {
-    background-color: #a52a2a !important;
+    background-color: rgb(21,31,56) !important;
     color:white;
 }
 
@@ -181,6 +184,16 @@ code {
     .jdp-day.today {
         border: 1px solid #00afff !important;
     }
+.jdp-months {
+    direction:ltr;
+}
+.jdp-years {
+    direction: ltr;
+    float:left;
+}
+.DateInput {
+    direction:ltr;
+}
 
 #profileContextMenu li {
     min-width: 150px;
@@ -221,6 +234,64 @@ code {
 input::-webkit-calendar-picker-indicator {
     opacity: 100;
 }
+
+.select2-container--default[dir="rtl"] .select2-selection--single .select2-selection__clear {
+    margin-left: 20px !important;
+    margin-right: 0px !important;
+}
+.select2-selection__clear {
+    margin-top:1px;
+}
+.select2-selection__rendered {
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+}
+.select2-container {
+    margin-top:-3px !important;
+}
+
+.opacityBg {
+    background-color: #ffffffd1;
+}
+.nav-tabs .nav-link {
+    margin-left:1px;
+}
+.nav-tabs .nav-link:not(.active) {
+    background-color: #ffffffb8 !important;
+}
+
+.mudBlazorTreeItem {
+    font-size:12px !important;
+}
+.mud-ripple {
+    padding:0 !important;
+}
+
+.mud-treeview-item-arrow .mud-treeview-item-arrow-expand.mud-transform {
+    transform: rotate(-90deg) !important;
+}
+
+.top-fixed-tooltip {
+    position: absolute;
+    left: 10px;
+    bottom: -11px;
+    padding: 7px 7px 5px 7px;
+    border-radius: 8px;
+    background-color: rgb(21,31,56);
+    color: white;
+    white-space: nowrap;
+    font-size: 12px;
+}
+    .top-fixed-tooltip::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: -11px; /* position arrow at right edge of tooltip */
+        transform: translateY(-50%);
+        border-width: 6px;
+        border-style: solid;
+        border-color: transparent rgb(21,31,56) transparent transparent;
+    }
 
 @font-face {
     font-family: IRANSans;

@@ -22,34 +22,43 @@ function initShamsiDateInputs(inputClass) {
 }
 
 function setDateInputMask(selector) {
-    $(selector).mask("0000r00r00", {
-        translation: {
-            'r': {
-                pattern: /[\/]/,
-                fallback: '/'
-            },
-            placeholder: "__/__/____"
-        },
-        selectOnFocus: true
-    });
+    Inputmask("9999/99/99", {
+        placeholder: "____/__/__",
+        showMaskOnHover: false,
+        showMaskOnFocus: true
+    }).mask($(selector));
 
-    $(selector).blur(function () {
-        setTimeout(function () { jalaliDatepicker.hide() }, 200);
-    });
-
-    $(selector).keyup(function (e) {
-        if (e.which == 13) // Enter key
-            $(this).blur();
+    $(document).keyup(function (e) {
+        if (e.which == 13 || e.which == 27 || e.which == 9) {
+            jalaliDatepicker.hide();
+        }
     });
 }
 
 function initMiladiDateInputs(inputClass) {
+    Inputmask("9999/99/99", {
+        placeholder: "____/__/__",
+        showMaskOnHover: false,
+        showMaskOnFocus: true
+    }).mask($('.DateInput'));
+
     setTimeout(function () {
         $('.DateInput').datepicker({
             dateFormat: 'yy/mm/dd',
+            changeYear: true,
             onSelect: function (dateText) {
                 this.dispatchEvent(new Event('change'));
             }
+        });
+
+        $(".DateInput").on("keydown", function (e) {
+            if (e.key === "Enter" || e.keyCode === 13) {
+                $(this).datepicker("hide");
+            }
+        });
+
+        $(".DateInput").on("click", function (e) {
+            $(this).datepicker("show");
         });
     }, 100);
 }

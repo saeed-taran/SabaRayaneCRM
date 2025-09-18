@@ -6,6 +6,7 @@
 @using Taran.Shared.UI.Components.CustomizedQuickGrid.Columns
 @using Taran.Shared.UI.Components.CustomizedQuickGrid.Infrastructure
 @using System.Reflection
+@using Taran.Shared.UI.Components.Dialog
 
 @typeparam TGridItem
 
@@ -16,7 +17,7 @@
         @{ FinishCollectingColumns(); }
         <ColumnsCollectedNotifier TGridItem="TGridItem" />
         <div class="position-relative">
-            <div class="w-100 table-responsive @(translator.CurrentLanguage.IsLeftToRight ? "grid-main-container-ltr" : "grid-main-container-rtl")">
+            <div class="w-100 table-responsive @(HaveAnyTools ? (translator.CurrentLanguage.IsLeftToRight ? "grid-main-container-ltr" : "grid-main-container-rtl") : "")">
                 <table id="@Id" theme="@Theme" aria-rowcount="@(_ariaBodyRowCount + 1)" @ref="_tableReference" @onclosecolumnoptions="CloseColumnOptions"
                        @attributes="AdditionalAttributes" class="@GridClass()" @onkeyup="AsyncCallbackWithoutStateChange<KeyboardEventArgs>.Create(TableKeyUp)">
                     <thead>
@@ -53,7 +54,12 @@
     </Defer>
 </CascadingValue>
 
+<ConfirmDialog Id="@(Id + "_DeleteConfirm")" @ref="deleteConfirmDialog" YesText="@translator.Translate(nameof(KeyWords.Yes))" NoText="@translator.Translate(nameof(KeyWords.Cancel))">
+</ConfirmDialog>
+
 @code {
+    private ConfirmDialog deleteConfirmDialog;
+
     private void RenderNonVirtualizedRows(RenderTreeBuilder __builder)
     {
         var initialRowIndex = 2; // aria-rowindex is 1-based, plus the first row is the header
@@ -69,7 +75,7 @@
 
     private void RenderRow(RenderTreeBuilder __builder, int rowIndex, TGridItem item)
     {
-        var rowCLass = rowIndex == _selectedRowIndex ? "selected-row" : "";
+        var rowCLass = _selectedRowIndex.Contains(rowIndex) ? "selected-row" : "";
         <tr @key="@(ItemKey(item))" aria-rowindex="@rowIndex" @ondblclick="@(() => RowDoubleClicked(rowIndex, item))" @onclick="@(()=>{ RowClicked(rowIndex, item); })" class="@rowCLass">
             @foreach (var col in _columns)
             {
@@ -111,7 +117,7 @@
                             bool isChecked = ((bool?)property.GetValue(item) ?? false);
                             if (isChecked)
                             {
-                                <input type='checkbox' disabled checked />
+                                <input type='checkbox' disabled checked/>
                             }
                             else
                             {
@@ -126,44 +132,47 @@
                 </td>
             }
 
-            <td class="fitTD pt-2 @(FixedToolsColumn ? "first-col-fixed end-0" : "")" style="width:@(ActionColumnWidth)px">
-                @if (OnDelete is not null)
-                {
-                    <span @onclick="@(() => DeleteItem(item))" class="m-1" role="button">
-                        <i class="fas fa-trash text-danger"></i>
-                    </span>
-                }
-                @if (OnSaveEdit is not null && EditingObjectType is not null)
-                {
-                    <span @onclick="@(() => StartEditing(rowIndex, item))" class="m-1" role="button">
-                        <i class="fas fa-edit text-dark"></i>
-                    </span>
-                }
-                else if (CustomeEditAction.HasDelegate)
-                {
-                    <span @onclick="@(async () => await CustomeEditAction.InvokeAsync(item))" class="m-1" role="button">
-                        <i class="fas fa-edit text-dark"></i>
-                    </span>
-                }
+            @if (HaveAnyTools)
+            {
+                <td class="fitTD pt-2 @(FixedToolsColumn ? "first-col-fixed end-0" : "")" style="width:@(ActionColumnWidth)px">
+                    @if (OnDelete is not null)
+                    {
+                        <span @onclick="@(() => DeleteItem(item))" class="m-1" role="button">
+                            <i class="fas fa-trash text-danger"></i>
+                        </span>
+                    }
+                    @if (OnSaveEdit is not null && EditingObjectType is not null)
+                    {
+                        <span @onclick="@(() => StartEditing(rowIndex, item))" class="m-1" role="button">
+                            <i class="fas fa-edit text-dark"></i>
+                        </span>
+                    }
+                    else if (CustomeEditAction.HasDelegate)
+                    {
+                        <span @onclick="@(async () => await CustomeEditAction.InvokeAsync(item))" class="m-1" role="button">
+                            <i class="fas fa-edit text-dark"></i>
+                        </span>
+                    }
 
-                @foreach (var customeAction in CustomeActions)
-                {
-                    <span @onclick="@(async () => await customeAction.Function(item))" class="m-1" role="button">
-                        <i class="@customeAction.Class"></i>
-                    </span>
-                }
+                    @foreach (var customeAction in CustomeActions)
+                    {
+                        <span @onclick="@(async () => await customeAction.Function(item))" class="m-1" role="button">
+                            <i class="@customeAction.Class"></i>
+                        </span>
+                    }
 
-                @{
-                    var saveCancelButtonsDisplay = rowIndex == _editingRowIndex ? "" : "hidden";
+                    @{
+                        var saveCancelButtonsDisplay = rowIndex == _editingRowIndex ? "" : "hidden";
 
-                    <span @onclick="CloseEdit" class="m-1 @saveCancelButtonsDisplay" role="button">
-                        <i class="fas fa-window-close text-danger"></i>
-                    </span>
-                    <span @onclick="SaveEdit" class="m-1 @saveCancelButtonsDisplay" role="button">
-                        <i class="fas fa-save text-black"></i>
-                    </span>
-                }
-            </td>    
+                        <span @onclick="CloseEdit" class="m-1 @saveCancelButtonsDisplay" role="button">
+                            <i class="fas fa-window-close text-danger"></i>
+                        </span>
+                        <span @onclick="SaveEdit" class="m-1 @saveCancelButtonsDisplay" role="button">
+                            <i class="fas fa-save text-black"></i>
+                        </span>
+                    }
+                </td>
+            }
             
         </tr>
     }
@@ -179,10 +188,30 @@
 
     private async Task RowClicked(int rowIndex, TGridItem item)
     {
-        _selectedRowIndex = rowIndex; 
-        _selectedItem = item;
+        if (!MultiSelect)
+        {
+            _selectedRowIndex.Clear();
+            _selectedItem.Clear();
+
+            _selectedRowIndex.Add(rowIndex);
+            _selectedItem.Add(item);
+        }
+        else
+        {
+            if (_selectedRowIndex.Contains(rowIndex))
+            {
+                _selectedItem.RemoveAt(_selectedRowIndex.IndexOf(rowIndex));
+                _selectedRowIndex.Remove(rowIndex);
+            }
+            else
+            {
+                _selectedRowIndex.Add(rowIndex);
+                _selectedItem.Add(item);
+            }
+        }
+
         if (OnSelectedChanged.HasDelegate)
-            await OnSelectedChanged.InvokeAsync(item);
+            await OnSelectedChanged.InvokeAsync(_selectedItem);
     }
 
     private async Task TableKeyUp(KeyboardEventArgs e)
@@ -264,36 +293,39 @@
                 </td>
             }
 
-            <td class="fitTD @(_showNewItemRow ? "pt-2" : "") @(FixedToolsColumn ? "first-col-fixed end-0" : "")" style="width:@(ActionColumnWidth)px">
-                @if (!_showNewItemRow)
-                {
-                    if (CreatingObjectType is not null && CreatingEnabled)
+            @if(HaveAnyTools)
+            {
+                <td class="fitTD @(_showNewItemRow ? "pt-2" : "") @(FixedToolsColumn ? "first-col-fixed end-0" : "")" style="width:@(ActionColumnWidth)px">
+                    @if (!_showNewItemRow)
                     {
-                        <span @onclick="@(() => StartCreating(rowIndex))" class="btn btn-sm border m-1" role="button">
-                            <i class="fas fa-plus text-black"></i>
-                            @translator.Translate(nameof(KeyWords.Create))
-                        </span>
-                    }
-                    else if (!string.IsNullOrWhiteSpace(CreatingPageUrl))
-                    {
-                        <span class="btn btn-sm border m-1" role="button">
-                            <a class="text-decoration-none text-black" href="@CreatingPageUrl">
+                        if (CreatingObjectType is not null && CreatingEnabled)
+                        {
+                            <span @onclick="@(() => StartCreating(rowIndex))" class="btn btn-sm border m-1" role="button">
                                 <i class="fas fa-plus text-black"></i>
                                 @translator.Translate(nameof(KeyWords.Create))
-                            </a>
+                            </span>
+                        }
+                        else if (!string.IsNullOrWhiteSpace(CreatingPageUrl))
+                        {
+                            <span class="btn btn-sm border m-1" role="button">
+                                <a class="text-decoration-none text-black" href="@CreatingPageUrl">
+                                    <i class="fas fa-plus text-black"></i>
+                                    @translator.Translate(nameof(KeyWords.Create))
+                                </a>
+                            </span>
+                        }
+                    }
+                    else
+                    {
+                        <span @onclick="CloseEdit" class="m-1 mt-2" role="button">
+                            <i class="fas fa-window-close text-danger"></i>
+                        </span>
+                        <span @onclick="SaveCreate" class="m-1 mt-2" role="button">
+                            <i class="fas fa-save text-black"></i>
                         </span>
                     }
-                }
-                else
-                {
-                    <span @onclick="CloseEdit" class="m-1 mt-2" role="button">
-                        <i class="fas fa-window-close text-danger"></i>
-                    </span>
-                    <span @onclick="SaveCreate" class="m-1 mt-2" role="button">
-                        <i class="fas fa-save text-black"></i>
-                    </span>
-                }
-            </td>
+                </td>
+            }
         </tr>
     }
 
@@ -316,7 +348,10 @@
             </th>
         }
 
-        <td class="fitTD @(FixedToolsColumn ? "first-col-fixed end-0" : "")" style="width:@(ActionColumnWidth)px"></td>
+        if(HaveAnyTools)
+        {
+            <td class="fitTD @(FixedToolsColumn ? "first-col-fixed end-0" : "")" style="width:@(ActionColumnWidth)px"></td>
+        }
     }
 
     private void RenderColumnHeadersOptions(RenderTreeBuilder __builder)
@@ -331,7 +366,10 @@
             </th>
         }
 
-        <td class="fitTD @(FixedToolsColumn ? "first-col-fixed end-0" : "")"></td>
+        if (HaveAnyTools)
+        {
+            <td class="fitTD @(FixedToolsColumn ? "first-col-fixed end-0" : "")"></td>
+        }
     }
 
     private void RenderCreateEditComponent(RenderTreeBuilder __builder, EditTemplate editTemplate, string value, object objectInstance, PropertyInfo property, string inputsClass, string checkBoxInputClass, int rowIndex, ColumnBase<TGridItem> columnBase, object rowItem)
@@ -346,8 +384,15 @@
             }
             else
             {
-                property.SetValue(objectInstance, null);
-                ClearSearchableDropDowns($"#{inputId}");
+                if (editTemplate.ClearValueWhenDisabled)
+                {
+                    property.SetValue(objectInstance, null);
+                    ClearSearchableDropDowns($"#{inputId}");
+                }
+                else 
+                {
+                    <span>@value</span>
+                }
                 return;
             }
         }
@@ -403,6 +448,32 @@
 
             MakeDropDownsSearchableById(inputId, value);
         }
+        else if (editTemplate.StringDropDownItems is not null)
+        {
+            var optionsContainValue = false;
+            <select id="@inputId" @onchange="@(e => InputValueChanged(objectInstance, property, e, editTemplate))" class="@inputsClass @fieldStatusDict[property.Name]?.InputElementClass">
+                <option value=""></option>
+                @foreach (var option in editTemplate.StringDropDownItems)
+                {
+                    var selected = (value == option.Item1.ToString());
+                    if (selected)
+                        optionsContainValue = true;
+                    <option value="@option.Item1" selected="@(selected)">
+                        @option.Item2
+                    </option>
+                }
+            </select>
+            @if (!optionsContainValue)
+            {
+                property.SetValue(objectInstance, null);
+            }
+            <span class="invalid-feedback">
+                <i class="fas fa-exclamation-circle"></i>
+                @translator.Translate(fieldStatusDict[property.Name]?.ErrorMessage ?? "")
+            </span>
+
+            MakeDropDownsSearchableById(inputId, value);
+        }
         else if (property.GetCustomAttribute<DateAttribute>() is not null)
         {
             <input id="@inputId" value="@value" @onchange="e => InputValueChanged(objectInstance, property, e, editTemplate)" onblur="this.dispatchEvent(new Event('change'));" class="DateInput @inputsClass @fieldStatusDict[property.Name]?.InputElementClass" autocomplete="off" data-jdp />
@@ -411,14 +482,6 @@
                 @translator.Translate(fieldStatusDict[property.Name]?.ErrorMessage ?? "")
             </span>
             SetDateinputMask(inputId);
-        }
-        else if (property.GetCustomAttribute<TimeAttribute>() is not null)
-        {
-            <input id="@inputId" value="@value" type="time" @onchange="e => InputValueChanged(objectInstance, property, e, editTemplate)" onblur="this.dispatchEvent(new Event('change'));" class="@inputsClass @fieldStatusDict[property.Name]?.InputElementClass" autocomplete="off" />
-            <span class="invalid-feedback">
-                <i class="fas fa-exclamation-circle"></i>
-                @translator.Translate(fieldStatusDict[property.Name]?.ErrorMessage ?? "")
-            </span>
         }
         else
         {

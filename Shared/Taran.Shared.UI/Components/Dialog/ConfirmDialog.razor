@@ -1,0 +1,58 @@
+﻿@using Taran.Shared.UI.Components.Bootstrap.Modal
+
+<BootstrapModal Id="@(Id + "_Modal")" @ref=_bootstrapModal BooststrapModalSize="BooststrapModalSize.sm" OnModalClosed="()=>{ _confirmed = _confirmed??false; }">
+    <Title>
+    </Title>
+    <Body>
+        @Caption
+    </Body>
+    <Footer>
+        <button class="btn btn-danger" @onclick="@(() => ButtonClicked(true))">@YesText</button>
+        <button class="btn btn-secondary" @onclick="@(() => ButtonClicked(false))">@NoText</button>
+    </Footer>
+</BootstrapModal>
+
+@code {
+    private BootstrapModal _bootstrapModal;
+
+    [Parameter]
+    [EditorRequired]
+    public string Id { get; set; }
+
+    [Parameter]
+    public string Caption { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public string YesText { get; set; } = "Yes";
+
+    [Parameter]
+    [EditorRequired]
+    public string NoText { get; set; } = "No";
+
+    private bool? _confirmed;
+
+    public async Task<bool> Confirm(string caption)
+    {
+        Caption = caption;
+        StateHasChanged();
+
+        _confirmed = null;
+        await _bootstrapModal.Open();
+
+        var waitForRespondTask = Task.Run<bool>(async () =>
+        {
+            while (_confirmed is null) await Task.Delay(50);
+
+            return _confirmed.Value;
+        });
+
+        return await waitForRespondTask;
+    }
+
+    private async void ButtonClicked(bool confirmed)
+    {
+        _confirmed = confirmed;
+        await _bootstrapModal.Close();
+    }
+}

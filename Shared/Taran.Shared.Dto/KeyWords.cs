@@ -46,5 +46,6 @@ public enum KeyWords
     AgreementDate,
     DurationInMonths,
     ExtraUsersCount,
-    Agreement
+    Agreement,
+    Yes
 }

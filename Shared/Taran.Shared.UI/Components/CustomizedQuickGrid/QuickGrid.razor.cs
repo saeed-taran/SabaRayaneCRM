@@ -283,9 +283,6 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
     /// <returns>A <see cref="Task"/> that represents the completion of the operation.</returns>
     public async Task RefreshDataAsync()
     {
-        _selectedRowIndex = -1;
-        _selectedItem = default;
-
         try
         {
             if (_editingRowIndex > -1)
@@ -303,6 +300,9 @@ public partial class QuickGrid<TGridItem> : IAsyncDisposable
     // because in that case there's going to be a re-render anyway.
     private async Task RefreshDataCoreAsync()
     {
+        _selectedRowIndex.Clear();
+        _selectedItem.Clear();
+
         // Move into a "loading" state, cancelling any earlier-but-still-pending load
         _pendingDataLoadCancellationTokenSource?.Cancel();
         var thisLoadCts = _pendingDataLoadCancellationTokenSource = new CancellationTokenSource();

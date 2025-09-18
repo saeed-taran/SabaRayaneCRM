@@ -5,6 +5,7 @@ public class EditTemplate
     public string PropertyName { get; private set; }
     public AutoCompleteItemsProvider AutoCompleteItemsProvider { get; private set; }
     public IReadOnlyCollection<(int, string)> DropDownItems { get; private set; }
+    public IReadOnlyCollection<(string, string)> StringDropDownItems { get; private set; }
     public delegate Task DropDownChanged(object? value);
     public DropDownChanged OnDropDownChanged { get; private set; }
     public bool IsSecret { get; private set; } = false;
@@ -12,6 +13,7 @@ public class EditTemplate
     public EditTemplateUsage EditTemplateUsage { get; set; } = EditTemplateUsage.Both;
 
     public Func<object, bool>? IsEnableFunction { get; private set; }
+    public bool ClearValueWhenDisabled { get; private set; } = true;
 
     public ThirdPartyComponent ThirdPartyComponent { get; private set; }
 
@@ -24,6 +26,12 @@ public class EditTemplate
     {
         PropertyName = propertyName;
         DropDownItems = dropDownItems;
+    }
+
+    public EditTemplate(string propertyName, List<(string, string)> stringDropDownItems)
+    {
+        PropertyName = propertyName;
+        StringDropDownItems = stringDropDownItems;
     }
 
     public EditTemplate(string propertyName, AutoCompleteItemsProvider autoCompleteItemsProvider)
@@ -44,7 +52,7 @@ public class EditTemplate
         return this;
     }
 
-    public EditTemplate Secure() 
+    public EditTemplate Secure()
     {
         IsSecret = true;
         return this;
@@ -56,9 +64,10 @@ public class EditTemplate
         return this;
     }
 
-    public EditTemplate SetAbilityDependency(Func<object, bool> isEnableFunction)
+    public EditTemplate SetAbilityDependency(Func<object, bool> isEnableFunction, bool clearValueWhenDisabled = true)
     {
         IsEnableFunction = isEnableFunction;
+        ClearValueWhenDisabled = clearValueWhenDisabled;
 
         return this;
     }

@@ -26,7 +26,7 @@ th ::deep .sort-indicator {
 }
 
 .hidden {
-    visibility:hidden;
+    visibility: hidden;
 }
 
 .col-sort-desc ::deep .sort-indicator, .col-sort-asc ::deep .sort-indicator {
@@ -106,15 +106,18 @@ html[dir=rtl] .col-justify-end .col-options {
     padding: 7px 16px;
     color: white;
 }
+
 .inlineEditCancelBtn {
     border: 1px solid #d2ade6;
     background-color: #c459d6;
     padding: 7px 16px;
     color: white;
 }
+
 .errorLable {
-    color:darkred;
+    color: darkred;
 }
+
 .fitTD {
     width: 1%;
     white-space: nowrap;
@@ -132,19 +135,21 @@ html[dir=rtl] .col-justify-end .col-options {
 }
 
 .selected-row {
-    background-color: rgb(215 243 253) !important;
+    background-color: rgb(192,166,107) !important;
 }
 
 .first-col-fixed {
     position: absolute;
     width: 100px;
-    background-color: #f5f5f5e3;
     height: 39px;
     padding-top: 0;
+    background-color: #ffffffd1;
 }
+
 .grid-main-container-rtl {
-    padding-left:100px;
+    padding-left: 100px;
 }
+
 .grid-main-container-ltr {
     padding-right: 100px;
 }

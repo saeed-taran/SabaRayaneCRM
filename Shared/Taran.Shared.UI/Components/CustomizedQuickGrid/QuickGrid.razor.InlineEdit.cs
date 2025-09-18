@@ -16,11 +16,12 @@ public partial class QuickGrid<TGridItem>
 
     [Parameter] public bool FixedToolsColumn { get; set; } = true;
 
-    [Parameter] public EventCallback<TGridItem> OnSelectedChanged { get; set; }
-    
-    private int _selectedRowIndex = -1;
-    private TGridItem? _selectedItem;
-    public TGridItem? SelectedItem => _selectedItem;
+    [Parameter] public EventCallback<IReadOnlyCollection<TGridItem>> OnSelectedChanged { get; set; }
+
+    [Parameter] public bool MultiSelect { get; set; } = false;
+    private List<int> _selectedRowIndex = new();
+    private List<TGridItem> _selectedItem = new();
+    public IReadOnlyCollection<TGridItem> SelectedItem => _selectedItem;
 
     private bool _showNewItemRow = false;
 
@@ -65,6 +66,8 @@ public partial class QuickGrid<TGridItem>
 
     private Dictionary<string, bool> columnStateChanged = new();
 
+    private bool HaveAnyTools => OnDelete is not null || EditingObjectType is not null || CreatingObjectType is not null || CustomeActions.Any();
+
     protected override Task OnInitializedAsync()
     {
         _editingObjectProperties = EditingObjectType?.GetProperties().ToList() ?? new();
@@ -93,12 +96,12 @@ public partial class QuickGrid<TGridItem>
 
         CloseEdit();
 
-        if(OnInlineEditStarting is not null)
+        if (OnInlineEditStarting is not null)
             await OnInlineEditStarting(item);
 
         _editingObject = Activator.CreateInstance(EditingObjectType);
 
-        foreach (var gridItemProperty in _gridItemProperties) 
+        foreach (var gridItemProperty in _gridItemProperties)
         {
             var editingObjectProperty = _editingObjectProperties.FirstOrDefault(p => p.Name == gridItemProperty.Name);
             if (editingObjectProperty is null)
@@ -118,7 +121,7 @@ public partial class QuickGrid<TGridItem>
 
         await MakeRowDropDownsSearchable(rowIndex);
     }
-    
+
     private async Task StartCreating(int rowIndex)
     {
         if (_showNewItemRow)
@@ -136,7 +139,7 @@ public partial class QuickGrid<TGridItem>
         await MakeRowDropDownsSearchable(rowIndex);
     }
 
-    private async Task MakeRowDropDownsSearchable(int rowIndex) 
+    private async Task MakeRowDropDownsSearchable(int rowIndex)
     {
         await jsRuntime.InvokeVoidAsync("setTimeout", $"initSelects('#{Id} tr[aria-rowindex=\"{rowIndex}\"] select', 0)", 1);
     }
@@ -146,7 +149,7 @@ public partial class QuickGrid<TGridItem>
     }
     private async Task ClearSearchableDropDowns(string? selector = null)
     {
-        await jsRuntime.InvokeVoidAsync("clearSelects", selector ?? "select");
+        await jsRuntime.InvokeVoidAsync("clearSelects", selector ?? $"#{Id} select");
     }
 
     private async Task SetDateinputMask(string inputId)
@@ -193,7 +196,7 @@ public partial class QuickGrid<TGridItem>
         }
     }
 
-    private bool ValidateObject(object Obj) 
+    private bool ValidateObject(object Obj)
     {
         var ctx = new ValidationContext(Obj);
         List<ValidationResult> validationResults = new List<ValidationResult>();
@@ -229,7 +232,7 @@ public partial class QuickGrid<TGridItem>
         if (OnEditOrCreateEnd.HasDelegate)
             await OnEditOrCreateEnd.InvokeAsync();
 
-        foreach (var col in _columns) 
+        foreach (var col in _columns)
         {
             col.EditTemplate?.ThirdPartyComponent?.ClearDisplayText();
         }
@@ -249,7 +252,7 @@ public partial class QuickGrid<TGridItem>
         {
             if ((e.Value == null || string.IsNullOrEmpty(e.Value + "")))
             {
-                if(propertyInfo.ToString().StartsWith("System.Nullable"))
+                if (propertyInfo.ToString().StartsWith("System.Nullable"))
                     safeValue = null;
                 else if (propertyType == typeof(string))
                     safeValue = "";
@@ -275,14 +278,13 @@ public partial class QuickGrid<TGridItem>
 
     private async Task DeleteItem(TGridItem item)
     {
-        bool confirmed = await JS.InvokeAsync<bool>("confirm", translator.Translate(nameof(KeyWords.DoYouWantToDeleteThisItem)));
+        bool confirmed = await deleteConfirmDialog.Confirm(translator.Translate(nameof(KeyWords.DoYouWantToDeleteThisItem)));
         if (confirmed)
         {
             var result = await OnDelete(item!);
-            if(result.Success)
+            if (result.Success)
                 await RefreshDataAsync();
             else
-                //_crudErrorMessage = result.ErrorMessage ?? "Unknown error!";
                 await toastService.Show(result.ErrorMessage ?? "Unknown error!", UI.Services.ToastKind.danger);
         }
     }
