@@ -11,8 +11,7 @@
 @inject IProductService productService;
 
 <QuickGrid Id="AgreementGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchAgreementResponseDto" Pagination="@pagination" @ref="grid" OnSaveEdit="SaveInlineEdit" EditingObjectType="typeof(UpdateAgreementRequestDto)" OnSaveNew="SaveInlineCreate" CreatingObjectType="typeof(CreateAgreementRequestDto)" OnDelete="OnItemDelete" Class="table table-borderless" Theme="none">
-    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Price))" Property="@(c => c.Price)"
-                    EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.Price))">
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Price))" Property="@(c => c.Price)">
     </PropertyColumn>
     <PropertyColumn Title="@translator.Translate(nameof(KeyWords.AgreementDate))" Property="@(c => c.AgreementDate)"
                     EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.AgreementDate))">

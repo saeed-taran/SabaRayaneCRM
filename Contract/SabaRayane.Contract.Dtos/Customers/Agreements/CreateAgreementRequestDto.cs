@@ -13,8 +13,8 @@ public record CreateAgreementRequestDto : RequestWithUserDtoBase
     [Range(1, int.MaxValue, ErrorMessage = nameof(KeyWords.FieldIsRequired))]
     public int ProductId { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = nameof(KeyWords.FieldIsRequired))]
-    public long Price { get; set; }
+    //[Range(1, int.MaxValue, ErrorMessage = nameof(KeyWords.FieldIsRequired))]
+    //public long Price { get; set; }
 
     [Date]
     public string AgreementDate { get; set; }
