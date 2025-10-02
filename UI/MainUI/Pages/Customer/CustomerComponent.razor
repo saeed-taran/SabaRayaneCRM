@@ -8,7 +8,10 @@
 
 @inject ICustomerService customerService;
 
-<QuickGrid Id="CustomerGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchCustomerResponseDto" Pagination="@pagination" @ref="grid" OnSaveEdit="SaveInlineEdit" EditingObjectType="typeof(UpdateCustomerRequestDto)" OnSaveNew="SaveInlineCreate" CreatingObjectType="typeof(CreateCustomerRequestDto)" OnDelete="OnItemDelete" Class="table table-borderless" Theme="none">
+<QuickGrid Id="CustomerGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchCustomerResponseDto" Pagination="@pagination" @ref="grid" OnSaveEdit="SaveInlineEdit" EditingObjectType="typeof(UpdateCustomerRequestDto)" 
+    OnSaveNew="SaveInlineCreate" CreatingObjectType="typeof(CreateCustomerRequestDto)" OnDelete="OnItemDelete" Class="table table-borderless" Theme="none"
+    CustomeActions="customeActions"
+>
     <PropertyColumn Title="@translator.Translate(nameof(KeyWords.CustomerId))" Property="@(c => c.CustomerId)"
             EditTemplate="new EditTemplate(nameof(SearchCustomerResponseDto.CustomerId))">
     </PropertyColumn>
@@ -51,8 +54,12 @@
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
     SearchCustomerRequestDto searchRequest = new();
 
+    List<CustomeAction<SearchCustomerResponseDto>> customeActions = [];
+
     protected override async Task OnInitializedAsync()
     {
+        customeActions.Add(new CustomeAction<SearchCustomerResponseDto>(ViewAgreementsClicked, "far fa-handshake"));
+
         GridItemsProvider = async req =>
         {
             searchRequest.Skip = req.StartIndex;
@@ -64,6 +71,11 @@
                 items: customersResponse.Data!.Results,
                 totalItemCount: customersResponse.Data.TotalCount);
         };
+    }
+
+    protected async Task ViewAgreementsClicked(SearchCustomerResponseDto item)
+    {
+        navigationManager.NavigateTo($"/agreement/{item.Id}");
     }
 
     protected async Task FilterChanged()

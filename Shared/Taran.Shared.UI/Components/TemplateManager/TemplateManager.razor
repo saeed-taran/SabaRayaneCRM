@@ -1,0 +1,55 @@
+﻿
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-3">
+            @foreach (var placeHolder in PlaceHolders)
+            {
+                <button @onclick=@(() => { PlaceHolderBtnClicked(placeHolder); }) class="btn form-control btn-default border">
+                    @placeHolder.Title
+                </button>
+            }
+        </div>
+        <div class="col-9">
+            <textarea id=@textAreaId @bind=Template class="form-control h-100"></textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 text-end pt-3">
+            <button class="btn btn-primary" @onclick=SaveTemplate>
+                @translator.Translate(nameof(KeyWords.Save))
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string textAreaId => $"{Id}_templateInput";
+
+    [Parameter, EditorRequired]
+    public string Id { get; set; }
+
+    [Parameter]
+    public List<PlaceHolderModel> PlaceHolders { get; set; } = [];
+
+    [Parameter]
+    public string Template { get; set; }
+
+    [Parameter, EditorRequired]
+    public Func<string, Task> OnSaveTemplate { get; set; }
+
+    public async Task SaveTemplate()
+    {
+        await OnSaveTemplate(Template);
+    }
+
+    public void SetTemplate(string template)
+    {
+        Template = template;    
+    }
+
+    public void PlaceHolderBtnClicked(PlaceHolderModel placeHolder)
+    {
+        jsRuntime.InvokeVoidAsync("insertTextAtCursor", textAreaId, placeHolder.Value);
+    }
+}

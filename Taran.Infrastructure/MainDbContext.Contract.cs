@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SabaRayane.Contract.Core.Aggregates.CustomerAggregate;
+using SabaRayane.Contract.Core.Aggregates.MessageTemplateAggregate;
 using SabaRayane.Contract.Core.Aggregates.ProductAggregate;
 using SabaRayane.Contract.Core.ValueObjects;
 
@@ -10,6 +11,7 @@ partial class MainDbContext
     private void ContractOnModelCreating(ModelBuilder modelBuilder, string schema)
     {
         RegisterSchemaForAssembly(modelBuilder, typeof(Customer), schema);
+        RegisterSchemaForListOfEntityTypes(modelBuilder, new() { typeof(PlaceHolder) }, schema);
 
         CustomizeContractEntityRelations(modelBuilder);
     }
@@ -22,4 +24,6 @@ partial class MainDbContext
 
     internal DbSet<Customer> Customer { get; private set; }
     internal DbSet<Product> Product { get; private set; }
+    internal DbSet<MessageTemplate> MessageTemplates { get; private set; }
+    internal DbSet<PlaceHolder> PlaceHolder { get; private set; }
 }

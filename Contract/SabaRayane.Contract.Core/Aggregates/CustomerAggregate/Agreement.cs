@@ -1,4 +1,5 @@
 ﻿using SabaRayane.Contract.Core.Aggregates.ProductAggregate;
+using System.ComponentModel.DataAnnotations.Schema;
 using Taran.Shared.Core.Entity;
 using Taran.Shared.Core.Exceptions;
 
@@ -19,6 +20,9 @@ public class Agreement : BaseEntity<int>
     public int DurationInMonths { get; private set; }
 
     public int ExtraUsersCount { get; private set; }
+
+    [NotMapped]
+    public DateOnly ExpireDate => AgreementDate.AddMonths(DurationInMonths);
 
     internal Agreement(int creatorUserId, int productId, long price, DateOnly agreementDate, int durationInMonths, int extraUsersCount)
         : base(creatorUserId)

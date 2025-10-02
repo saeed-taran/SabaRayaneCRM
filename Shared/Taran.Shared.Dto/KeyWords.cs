@@ -47,5 +47,10 @@ public enum KeyWords
     DurationInMonths,
     ExtraUsersCount,
     Agreement,
-    Yes
+    Yes,
+    Message,
+    DaysUntilAgreementExpire,
+    MessageTemplates,
+    NewTemplate,
+    Save
 }

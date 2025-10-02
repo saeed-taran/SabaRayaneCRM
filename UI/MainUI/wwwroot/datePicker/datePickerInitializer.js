@@ -43,11 +43,15 @@ function initMiladiDateInputs(inputClass) {
     }).mask($('.DateInput'));
 
     setTimeout(function () {
-        $('.DateInput').datepicker({
-            dateFormat: 'yy/mm/dd',
-            changeYear: true,
-            onSelect: function (dateText) {
-                this.dispatchEvent(new Event('change'));
+        $(document).on("focus", ".DateInput", function () {
+            if (!$(this).hasClass("hasDatepicker")) {
+                $(this).datepicker({
+                    dateFormat: 'yy/mm/dd',
+                    changeYear: true,
+                    onSelect: function (dateText) {
+                        this.dispatchEvent(new Event('change'));
+                    }
+                });
             }
         });
 

@@ -62,9 +62,9 @@ public partial class QuickGrid<TGridItem>
 
     [Parameter] public string CreatingPageUrl { get; set; }
 
-    private Dictionary<string, FieldsVisualStatus> fieldStatusDict = new();
+    private Dictionary<string, object?> DefaultValues = new();
 
-    private Dictionary<string, bool> columnStateChanged = new();
+    private Dictionary<string, FieldsVisualStatus> fieldStatusDict = new();
 
     private bool HaveAnyTools => OnDelete is not null || EditingObjectType is not null || CreatingObjectType is not null || CustomeActions.Any();
 
@@ -89,6 +89,11 @@ public partial class QuickGrid<TGridItem>
         return base.OnInitializedAsync();
     }
 
+    public void AddDefaultValue(string propertyName, object? value)
+    {
+        DefaultValues.Add(propertyName, value);
+    }
+
     private async Task StartEditing(int rowIndex, TGridItem item)
     {
         if (rowIndex == _editingRowIndex)
@@ -99,7 +104,7 @@ public partial class QuickGrid<TGridItem>
         if (OnInlineEditStarting is not null)
             await OnInlineEditStarting(item);
 
-        _editingObject = Activator.CreateInstance(EditingObjectType);
+        _editingObject = Activator.CreateInstance(EditingObjectType) ?? throw new Exception("Unable to create instance for new item.");
 
         foreach (var gridItemProperty in _gridItemProperties)
         {
@@ -109,6 +114,9 @@ public partial class QuickGrid<TGridItem>
 
             var propertyValue = gridItemProperty.GetValue(item);
             editingObjectProperty.SetValue(_editingObject, propertyValue);
+
+            if(DefaultValues.ContainsKey(gridItemProperty.Name))
+                editingObjectProperty.SetValue(_editingObject, DefaultValues[gridItemProperty.Name]);
 
             var colWithEditTemplate = _columns.FirstOrDefault(c => c.EditTemplate?.PropertyName == gridItemProperty.Name);
             if (colWithEditTemplate?.EditTemplate?.OnDropDownChanged is not null)
@@ -132,7 +140,25 @@ public partial class QuickGrid<TGridItem>
         if (OnCreateStarting is not null)
             await OnCreateStarting();
 
-        _creatingObject = Activator.CreateInstance(CreatingObjectType);
+        _creatingObject = Activator.CreateInstance(CreatingObjectType) ?? throw new Exception("Unable to create instance for edit item.");
+
+        if (DefaultValues.Any()) 
+        {
+            var props = CreatingObjectType.GetProperties(
+                BindingFlags.Public | BindingFlags.Instance
+            );
+
+            foreach (var kv in DefaultValues)
+            {
+                var prop = props.FirstOrDefault(p => p.Name.Equals(kv.Key, StringComparison.OrdinalIgnoreCase));
+
+                if (prop != null && prop.CanWrite)
+                {
+                    object? value = kv.Value;
+                    prop.SetValue(_creatingObject, value);
+                }
+            }
+        }
 
         _showNewItemRow = true;
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using SabaRayane.Contract.Core.Aggregates.MessageTemplateAggregate;
 using Taran.Identity.Access;
 using Taran.Identity.Core.Aggregates.RoleAggregate;
 using Taran.Identity.Core.Aggregates.UserAggregate;
@@ -36,5 +37,15 @@ public static class SeedData
 
             context.SaveChanges();
         }
+
+        foreach (var placeHolder in PlaceHolder.PlaceHolders) 
+        {
+            if (!context.PlaceHolder.Any(p => p.Id == placeHolder.Id))
+            {
+                context.PlaceHolder.Add(placeHolder);
+            }
+        }
+
+        context.SaveChanges();
     }
 }

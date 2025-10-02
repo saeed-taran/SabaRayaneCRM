@@ -1,6 +1,7 @@
-﻿@page "/agreement"
+﻿@page "/agreement/{CustomerId:int?}"
 
 @using SabaRayane.Contract.Dtos.Customers.Agreements
+@using SabaRayane.Contract.Dtos.s.Customers
 @using Taran.Shared.Dtos.Languages
 @using Taran.Shared.UI.Components.CustomizedQuickGrid
 @using Taran.Shared.UI.Components.CustomizedQuickGrid.Columns
@@ -9,6 +10,20 @@
 
 @inject ICustomerService customerService;
 @inject IProductService productService;
+
+@if(CustomerId is not null)
+{
+    <div class="mb-2">
+        <a class="btn btn-warning text-black" href="/customer">
+            <span class="far fa-hand-point-right"></span>
+            @translator.Translate(nameof(KeyWords.Return))
+        </a>
+
+        <span class="ms-3">
+            @customer?.FullName
+        </span>
+    </div>
+}
 
 <QuickGrid Id="AgreementGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchAgreementResponseDto" Pagination="@pagination" @ref="grid" OnSaveEdit="SaveInlineEdit" EditingObjectType="typeof(UpdateAgreementRequestDto)" OnSaveNew="SaveInlineCreate" CreatingObjectType="typeof(CreateAgreementRequestDto)" OnDelete="OnItemDelete" Class="table table-borderless" Theme="none">
     <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Price))" Property="@(c => c.Price)">
@@ -25,9 +40,12 @@
     <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Product))" Property="@(c => c.ProductName)"
                     EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.ProductId), ProductDropDownItems)">
     </PropertyColumn>
-    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Customer))" Property="@(c => c.CustomerName)"
-                    EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.CustomerId), CustomerDropDownItems)">
-    </PropertyColumn>
+    @if (CustomerId is null)
+    {
+        <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Customer))" Property="@(c => c.CustomerName)"
+            EditTemplate="new EditTemplate(nameof(SearchAgreementResponseDto.CustomerId), CustomerDropDownItems)">
+        </PropertyColumn>
+    }
 </QuickGrid>
 
 <div class="row bg-default">
@@ -46,9 +64,10 @@
     </div>
 </div>
 
-
-
 @code {
+    [Parameter]
+    public int? CustomerId { get; set; }
+
     QuickGrid<SearchAgreementResponseDto>? grid;
     GridItemsProvider<SearchAgreementResponseDto>? GridItemsProvider;
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
@@ -57,17 +76,31 @@
     List<(int, string)> ProductDropDownItems = new();
     List<(int, string)> CustomerDropDownItems = new();
 
+    SearchCustomerResponseDto? customer;
 
     protected override async Task OnInitializedAsync()
     {
         ProductDropDownItems = await productService.GetProductDropDownItems(0, 1000, "");
         CustomerDropDownItems = await customerService.GetCustomerDropDownItems(0, 1000, "");
 
+        if (CustomerId is not null)
+        {
+            grid?.AddDefaultValue(nameof(SearchAgreementResponseDto.CustomerId), CustomerId);
+
+            var customers = await customerService.SearchCustomer(new SearchCustomerRequestDto()
+                {
+                    CustomerId = CustomerId,
+                    Skip = 0,
+                    Take = 1,
+                });
+            customer = customers?.Data?.Results.FirstOrDefault();
+        }
 
         GridItemsProvider = async req =>
         {
             searchRequest.Skip = req.StartIndex;
             searchRequest.Take = req.Count ?? 10;
+            searchRequest.CustomerId = CustomerId;
 
             var customersResponse = await customerService.SearchAgreement(searchRequest);
 
@@ -75,6 +108,11 @@
                 items: customersResponse.Data!.Results,
                 totalItemCount: customersResponse.Data.TotalCount);
         };
+    }
+
+    protected bool IsCustomerDropDownEnable(object editCreateObject)
+    {
+        return CustomerId is null;
     }
 
     protected async Task FilterChanged()

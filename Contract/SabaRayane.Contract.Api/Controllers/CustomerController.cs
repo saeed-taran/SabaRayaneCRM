@@ -9,82 +9,81 @@ using Taran.Shared.Api.Attributes;
 using Taran.Shared.Api.Controllers;
 using Taran.Shared.Core.User;
 
-namespace SabaRayane.Contract.Api.Controllers
+namespace SabaRayane.Contract.Api.Controllers;
+
+public class CustomerController : AuthorizedControllerBase
 {
-    public class CustomerController : AuthorizedControllerBase
+    private readonly ILogger<CustomerController> logger;
+    private readonly IMediator mediator;
+    private readonly IAppUser appUser;
+
+    public CustomerController(IMediator mediator, ILogger<CustomerController> logger, IAppUser appUser, IHttpContextAccessor httpContextAccessor)
+        : base(mediator, appUser, httpContextAccessor)
     {
-        private readonly ILogger<CustomerController> logger;
-        private readonly IMediator mediator;
-        private readonly IAppUser appUser;
-
-        public CustomerController(IMediator mediator, ILogger<CustomerController> logger, IAppUser appUser, IHttpContextAccessor httpContextAccessor)
-            : base(mediator, appUser, httpContextAccessor)
-        {
-            this.logger = logger;
-            this.mediator = mediator;
-            this.appUser = appUser;
-        }
-
-
-        #region Customer actions
-        [HttpGet]
-        [CustomeAuthorize((int)AccessNames.Customer_Get)]
-        public async Task<ActionResult> Get([FromQuery] SearchCustomerQuery searchCustomerQuery)
-        {
-            return Ok(await SendQuery(searchCustomerQuery));
-        }
-
-        [HttpPost]
-        [CustomeAuthorize((int)AccessNames.Customer_Create)]
-        public async Task<ActionResult> Create([FromBody] CreateCustomerCommand createCustomerCommand)
-        {
-            return Ok(await SendCommand(createCustomerCommand));
-        }
-
-        [HttpPut]
-        [CustomeAuthorize((int)AccessNames.Customer_Update)]
-        public async Task<ActionResult> Update([FromBody] UpdateCustomerCommand updateCustomerCommand)
-        {
-            return Ok(await SendCommand(updateCustomerCommand));
-        }
-
-        [HttpDelete("{Id}")]
-        [CustomeAuthorize((int)AccessNames.Customer_Delete)]
-        public async Task<ActionResult> Delete([FromRoute] DeleteCustomerCommand deleteCustomerCommand)
-        {
-            return Ok(await SendCommand(deleteCustomerCommand));
-        }
-        #endregion
-
-        #region Agreement actions
-        [HttpGet("Agreement")]
-        [CustomeAuthorize((int)AccessNames.Agreement_Get)]
-        public async Task<ActionResult> Get([FromQuery] SearchAgreementQuery searchAgreementQuery)
-        {
-            return Ok(await SendQuery(searchAgreementQuery));
-        }
-
-        [HttpPost("Agreement")]
-        [CustomeAuthorize((int)AccessNames.Agreement_Create)]
-        public async Task<ActionResult> Create([FromBody] CreateAgreementCommand createAgreementCommand)
-        {
-            return Ok(await SendCommand(createAgreementCommand));
-        }
-
-        [HttpPut("Agreement")]
-        [CustomeAuthorize((int)AccessNames.Agreement_Update)]
-        public async Task<ActionResult> Update([FromBody] UpdateAgreementCommand updateAgreementCommand)
-        {
-            return Ok(await SendCommand(updateAgreementCommand));
-        }
-
-        [HttpDelete("Agreement/{Id}")]
-        [CustomeAuthorize((int)AccessNames.Agreement_Delete)]
-        public async Task<ActionResult> Delete([FromRoute] DeleteAgreementCommand deleteAgreementCommand)
-        {
-            return Ok(await SendCommand(deleteAgreementCommand));
-        }
-        #endregion
-
+        this.logger = logger;
+        this.mediator = mediator;
+        this.appUser = appUser;
     }
+
+
+    #region Customer actions
+    [HttpGet]
+    [CustomeAuthorize((int)AccessNames.Customer_Get)]
+    public async Task<ActionResult> Get([FromQuery] SearchCustomerQuery searchCustomerQuery)
+    {
+        return Ok(await SendQuery(searchCustomerQuery));
+    }
+
+    [HttpPost]
+    [CustomeAuthorize((int)AccessNames.Customer_Create)]
+    public async Task<ActionResult> Create([FromBody] CreateCustomerCommand createCustomerCommand)
+    {
+        return Ok(await SendCommand(createCustomerCommand));
+    }
+
+    [HttpPut]
+    [CustomeAuthorize((int)AccessNames.Customer_Update)]
+    public async Task<ActionResult> Update([FromBody] UpdateCustomerCommand updateCustomerCommand)
+    {
+        return Ok(await SendCommand(updateCustomerCommand));
+    }
+
+    [HttpDelete("{Id}")]
+    [CustomeAuthorize((int)AccessNames.Customer_Delete)]
+    public async Task<ActionResult> Delete([FromRoute] DeleteCustomerCommand deleteCustomerCommand)
+    {
+        return Ok(await SendCommand(deleteCustomerCommand));
+    }
+    #endregion
+
+    #region Agreement actions
+    [HttpGet("Agreement")]
+    [CustomeAuthorize((int)AccessNames.Agreement_Get)]
+    public async Task<ActionResult> Get([FromQuery] SearchAgreementQuery searchAgreementQuery)
+    {
+        return Ok(await SendQuery(searchAgreementQuery));
+    }
+
+    [HttpPost("Agreement")]
+    [CustomeAuthorize((int)AccessNames.Agreement_Create)]
+    public async Task<ActionResult> Create([FromBody] CreateAgreementCommand createAgreementCommand)
+    {
+        return Ok(await SendCommand(createAgreementCommand));
+    }
+
+    [HttpPut("Agreement")]
+    [CustomeAuthorize((int)AccessNames.Agreement_Update)]
+    public async Task<ActionResult> Update([FromBody] UpdateAgreementCommand updateAgreementCommand)
+    {
+        return Ok(await SendCommand(updateAgreementCommand));
+    }
+
+    [HttpDelete("Agreement/{Id}")]
+    [CustomeAuthorize((int)AccessNames.Agreement_Delete)]
+    public async Task<ActionResult> Delete([FromRoute] DeleteAgreementCommand deleteAgreementCommand)
+    {
+        return Ok(await SendCommand(deleteAgreementCommand));
+    }
+    #endregion
+
 }

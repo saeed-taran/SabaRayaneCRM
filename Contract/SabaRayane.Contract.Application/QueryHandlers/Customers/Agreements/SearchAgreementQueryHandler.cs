@@ -24,7 +24,7 @@ public class SearchAgreementQueryHandler : IRequestHandler<SearchAgreementQuery,
     public async Task<PaginatedResponseDto<SearchAgreementResponseDto>> Handle(SearchAgreementQuery request, CancellationToken cancellationToken)
      {
         
-        var specification = new SearchAgreementSpecification(request.Skip, request.Take);
+        var specification = new SearchAgreementSpecification(request.Skip, request.Take, request.CustomerId);
         var agreements = await agreementReadRepository.FindWithSpecification(specification).ToListAsync(cancellationToken);
         
         specification.SetIgnorePagination(true);

@@ -7,9 +7,9 @@ public class CustomeAction<TGridItem>
     public Func<TGridItem, Task> Function { get; set; }
     public string Class { get; set; }
 
-    public CustomeAction(Func<TGridItem, Task> function, string @class)
+    public CustomeAction(Func<TGridItem, Task> function, string cssClass)
     {
         Function = function;
-        Class = @class;
+        Class = cssClass;
     }
 }

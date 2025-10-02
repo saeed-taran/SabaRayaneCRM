@@ -21,7 +21,7 @@ public class SearchCustomerQueryHandler : IRequestHandler<SearchCustomerQuery, P
     public async Task<PaginatedResponseDto<SearchCustomerResponseDto>> Handle(SearchCustomerQuery request, CancellationToken cancellationToken)
      {
         
-        var specification = new SearchCustomerSpecification(request.Skip, request.Take);
+        var specification = new SearchCustomerSpecification(request.Skip, request.Take, request.CustomerId);
         var customers = await customerReadRepository.FindWithSpecification(specification).ToListAsync(cancellationToken);
         
         specification.SetIgnorePagination(true);

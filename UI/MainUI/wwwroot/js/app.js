@@ -16,3 +16,23 @@ function collapseAccordionByHref(href) {
     var containingCollaps = aElement.parents(".accordion-collapse");
     containingCollaps.collapse('show');
 }
+
+function insertTextAtCursor(textareaId, text) {
+    const textarea = document.getElementById(textareaId);
+    if (!textarea) return;
+
+    if (document.activeElement !== textarea) {
+        textarea.focus();
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+
+    textarea.value = textarea.value.substring(0, start)
+        + text
+        + textarea.value.substring(end);
+
+    textarea.selectionStart = textarea.selectionEnd = start + text.length;
+
+    textarea.dispatchEvent(new Event('input'));
+}

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taran.Infrastructure;
 
@@ -11,9 +12,11 @@ using Taran.Infrastructure;
 namespace Taran.Infrastructure.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    partial class MainDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250930163712_MessageTemplate_Entities_Added")]
+    partial class MessageTemplate_Entities_Added
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,7 +34,7 @@ namespace Taran.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("CreatorUserId")
                         .HasColumnType("int");
@@ -43,7 +46,7 @@ namespace Taran.Infrastructure.Migrations
                         .HasColumnType("time");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
@@ -65,7 +68,7 @@ namespace Taran.Infrastructure.Migrations
                         .HasColumnType("date");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("CreatorUserId")
                         .HasColumnType("int");
@@ -83,7 +86,7 @@ namespace Taran.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<long>("Price")
                         .HasColumnType("bigint");
@@ -109,7 +112,7 @@ namespace Taran.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("CreatorUserId")
                         .HasColumnType("int");
@@ -117,11 +120,11 @@ namespace Taran.Infrastructure.Migrations
                     b.Property<string>("CustomerId")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("varchar");
 
                     b.Property<int?>("EditorUserId")
                         .HasColumnType("int");
@@ -129,22 +132,22 @@ namespace Taran.Infrastructure.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("MobileNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("StoreName")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar");
 
                     b.HasKey("Id");
 
@@ -160,7 +163,7 @@ namespace Taran.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("CreatorUserId")
                         .HasColumnType("int");
@@ -173,16 +176,14 @@ namespace Taran.Infrastructure.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("varchar");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar");
 
                     b.HasKey("Id");
 
@@ -196,17 +197,15 @@ namespace Taran.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Path")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar");
 
                     b.HasKey("Id");
 
-                    b.ToTable("PlaceHolder", "contract");
+                    b.ToTable("PlaceHolder");
                 });
 
             modelBuilder.Entity("SabaRayane.Contract.Core.Aggregates.ProductAggregate.Product", b =>
@@ -218,25 +217,25 @@ namespace Taran.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("CreatorUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("varchar");
 
                     b.Property<int?>("EditorUserId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar");
 
                     b.Property<long>("Price")
                         .HasColumnType("bigint");
@@ -255,7 +254,7 @@ namespace Taran.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("CreatorUserId")
                         .HasColumnType("int");
@@ -264,16 +263,16 @@ namespace Taran.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Title")
                         .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("varchar");
 
                     b.HasKey("Id");
 
@@ -295,7 +294,7 @@ namespace Taran.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("CreatorUserId")
                         .HasColumnType("int");
@@ -304,7 +303,7 @@ namespace Taran.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
@@ -326,7 +325,7 @@ namespace Taran.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("CreatorUserId")
                         .HasColumnType("int");
@@ -336,11 +335,11 @@ namespace Taran.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("FirstName")
                         .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("varchar");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -350,13 +349,13 @@ namespace Taran.Infrastructure.Migrations
 
                     b.Property<string>("LastName")
                         .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("varchar");
 
                     b.Property<DateTime?>("LastUseDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -365,12 +364,12 @@ namespace Taran.Infrastructure.Migrations
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(16)
-                        .HasColumnType("nvarchar(16)");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("varchar");
 
                     b.HasKey("Id");
 
@@ -389,7 +388,7 @@ namespace Taran.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("CreatorUserId")
                         .HasColumnType("int");
@@ -398,7 +397,7 @@ namespace Taran.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");

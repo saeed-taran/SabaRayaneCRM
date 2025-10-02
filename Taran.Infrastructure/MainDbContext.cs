@@ -26,8 +26,6 @@ public partial class MainDbContext : DbContext
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
-        configurationBuilder.Properties<DateTime>().HaveColumnType("datetime");
-        configurationBuilder.Properties<string>().HaveColumnType("varchar");
     }
     
     private void RegisterSchemaForAssembly(ModelBuilder modelBuilder, Type sampleEntityInTargetAssembly, string schema) 

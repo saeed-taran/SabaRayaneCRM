@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Taran.Identity.Access;
+﻿namespace Taran.Identity.Access;
 
 public enum AccessNames
 {
@@ -27,4 +25,9 @@ public enum AccessNames
     Agreement_Create = 17,
     Agreement_Update = 18,
     Agreement_Delete = 19,
+    
+    MessageTemplate_Get = 20,
+    MessageTemplate_Create = 21,
+    MessageTemplate_Update = 22,
+    MessageTemplate_Delete = 23,
 }

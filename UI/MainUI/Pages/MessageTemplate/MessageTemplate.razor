@@ -1,0 +1,126 @@
+﻿@page "/messageTemplate"
+
+@using SabaRayane.Contract.Dtos.s.MessageTemplates
+@using Taran.Shared.Dtos.Languages
+@using Taran.Shared.UI.Components.Bootstrap.Modal
+@using Taran.Shared.UI.Components.CustomizedQuickGrid
+@using Taran.Shared.UI.Components.CustomizedQuickGrid.Columns
+@using Taran.Shared.UI.Components.TemplateManager
+@using Taran.UI.Main.Services.MessageTemplateServices
+
+@inject IMessageTemplateService messageTemplateService;
+
+<QuickGrid Id="MessageTemplateGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchMessageTemplateResponseDto" Pagination="@pagination" @ref="grid" 
+    OnSaveEdit="SaveInlineEdit" EditingObjectType="typeof(UpdateMessageTemplateRequestDto)" OnSaveNew="SaveInlineCreate" 
+    CreatingObjectType="typeof(CreateMessageTemplateRequestDto)" OnDelete="OnItemDelete" Class="table table-borderless" Theme="none"
+           OnInlineEditStarting="async (e) => { templateManager.SetTemplate(e.Message); }"
+           OnCreateStarting="async () => { templateManager.SetTemplate(string.Empty); }">
+
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Name))" Property="@(c => c.Name)"
+            EditTemplate="new EditTemplate(nameof(SearchMessageTemplateResponseDto.Name))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Message))" Property="@(c => c.Message)"
+            EditTemplate="new EditTemplate(nameof(SearchMessageTemplateResponseDto.Message))
+                        .SetThirdPartyComponent(templateEditorThirdPartyComponent)">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.DaysUntilAgreementExpire))" Property="@(c => c.DaysUntilAgreementExpire)"
+            EditTemplate="new EditTemplate(nameof(SearchMessageTemplateResponseDto.DaysUntilAgreementExpire))">
+    </PropertyColumn>
+
+</QuickGrid>
+
+<div class="row bg-default">
+    <div class="col-8">
+        <Paginator State="@pagination" />
+    </div>
+    <div class="col-4">
+        <div class="d-inline float-end me-5">
+            @translator.Translate(nameof(KeyWords.ItemsPerPage))
+            <select @bind="@pagination.ItemsPerPage">
+                <option>10</option>
+                <option>15</option>
+                <option>20</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<BootstrapModal @ref=templateEditorModal Id="TemplateEditorModal" BooststrapModalSize="BooststrapModalSize.lg">
+    <Title>
+        @translator.Translate(nameof(KeyWords.NewTemplate))
+    </Title>
+    <Body>
+        <TemplateManager Id="MessageTemplate" @ref=templateManager PlaceHolders="@placeHolders" OnSaveTemplate=TemplateManagerSave>
+
+        </TemplateManager>
+    </Body>
+</BootstrapModal>
+
+@code {
+    QuickGrid<SearchMessageTemplateResponseDto>? grid;
+    GridItemsProvider<SearchMessageTemplateResponseDto>? GridItemsProvider;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    SearchMessageTemplateRequestDto searchRequest = new();
+
+    BootstrapModal templateEditorModal;
+
+    List<PlaceHolderModel> placeHolders = [];
+
+    ThirdPartyComponent templateEditorThirdPartyComponent;
+    TemplateManager templateManager;
+
+    protected override async Task OnInitializedAsync()
+    {
+        placeHolders.Add(new() { Title = "مشتری", Value="@Customer" });
+        placeHolders.Add(new() { Title = "فروشگاه", Value="@Store" });
+        placeHolders.Add(new() { Title = "قیمت", Value="@Price" });
+        placeHolders.Add(new() { Title = "تاریخ انقضاء", Value="@ExpireDate" });
+
+        templateEditorThirdPartyComponent = new ThirdPartyComponent(async () => { await templateEditorModal.Open(); });
+
+        GridItemsProvider = async req =>
+        {
+            searchRequest.Skip = req.StartIndex;
+            searchRequest.Take = req.Count ?? 10;
+
+            var messageTemplatesResponse = await messageTemplateService.SearchMessageTemplate(searchRequest);
+
+            return GridItemsProviderResult.From(
+                items: messageTemplatesResponse.Data!.Results,
+                totalItemCount: messageTemplatesResponse.Data.TotalCount);
+        };
+    }
+
+    protected async Task FilterChanged()
+    {
+        await grid!.RefreshDataAsync();
+    }
+
+    protected async Task TemplateManagerSave(string template)
+    {
+        await templateEditorThirdPartyComponent.SetValue(template, template);
+        await templateEditorModal.Close();
+
+        StateHasChanged();
+    }
+
+    protected async Task<GridItemEditResult> OnItemDelete(SearchMessageTemplateResponseDto item)
+    {
+        var result = await messageTemplateService.DeleteMessageTemplate(item.Id);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+
+    protected async Task<GridItemEditResult> SaveInlineEdit(object updateRequestDto)
+    {
+        var result = await messageTemplateService.UpdateMessageTemplate((UpdateMessageTemplateRequestDto)updateRequestDto);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+
+    protected async Task<GridItemEditResult> SaveInlineCreate(object createRequestDto)
+    {
+        var request = (CreateMessageTemplateRequestDto)createRequestDto;
+        var result = await messageTemplateService.CreateMessageTemplate(request);
+        return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+}
+
