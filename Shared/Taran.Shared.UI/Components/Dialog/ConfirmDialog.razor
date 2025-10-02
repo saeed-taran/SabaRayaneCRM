@@ -1,4 +1,6 @@
-﻿@using Taran.Shared.UI.Components.Bootstrap.Modal
+﻿@using Taran.Shared.Language
+@using Taran.Shared.Languages
+@using Taran.Shared.UI.Components.Bootstrap.Modal
 
 <BootstrapModal Id="@(Id + "_Modal")" @ref=_bootstrapModal BooststrapModalSize="BooststrapModalSize.sm" OnModalClosed="()=>{ _confirmed = _confirmed??false; }">
     <Title>

@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using Newtonsoft.Json;
 using Taran.Shared.Dtos.Languages;
-using Taran.Shared.Dtos.WrappedResponse;
-using Taran.Shared.UI.ConfigurationModels;
-using Taran.Shared.UI.Languages;
+using Taran.Shared.Languages;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Web;
+using Taran.Shared.Dtos.WrappedResponse;
+using Taran.Shared.UI.ConfigurationModels;
 
 namespace Taran.Shared.UI.Services.HttpService;
 
@@ -86,6 +88,32 @@ public class HttpService : IHttpService
             //_navigationManager.NavigateTo(_navConfig.UI + "/login", true);
             return new BackendResponse<Response>(false, "", default);
         }
+    }
+
+    public async Task<BackendResponse<Response>> UploadFile<Response>(string url, IBrowserFile browserFile)
+    {
+        var fileContent = new MultipartFormDataContent();
+
+        MemoryStream memoryStream = new();
+        await browserFile.OpenReadStream().CopyToAsync(memoryStream);
+
+        var dataContent = new ByteArrayContent(memoryStream.GetBuffer());
+        dataContent.Headers.ContentType = MediaTypeHeaderValue.Parse(browserFile.ContentType);
+
+        fileContent.Add(dataContent, "file", browserFile.Name);
+
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, url);
+        httpRequestMessage.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+        httpRequestMessage.Headers.Add("X-Requested-With", ["XMLHttpRequest"]);
+        httpRequestMessage.Content = fileContent;
+
+        var response = await _httpClient.SendAsync(httpRequestMessage);
+        var backendResponse = await response.Content.ReadFromJsonAsync<BackendResponse<Response>>();
+        if (backendResponse is null)
+            throw new Exception("Backend response was null!!");
+        if (!backendResponse.Success)
+            backendResponse.SetErrorMessage(_translator.Translate(backendResponse.ErrorMessage ?? nameof(KeyWords.UnknownError)));
+        return backendResponse;
     }
 
     private string ObjectToQueryString(object obj)

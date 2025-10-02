@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Taran.Shared.Dtos.ConfigurationModels;
+namespace Taran.Shared.Language;
 
 public record CultureConfiguration
 {

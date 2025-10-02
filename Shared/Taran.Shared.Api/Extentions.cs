@@ -5,18 +5,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using System.Net;
 using Taran.Shared.Api.Configurations;
 using Taran.Shared.Api.JWT;
 using Taran.Shared.Api.Middlewares;
 using Taran.Shared.Api.User;
-using Taran.Shared.Core.User;
 using Taran.Shared.Core.Exceptions;
+using Taran.Shared.Core.User;
 using Taran.Shared.Dtos.Attributes;
-using Taran.Shared.Dtos.ConfigurationModels;
 using Taran.Shared.Dtos.Services.Calendar;
 using Taran.Shared.Dtos.WrappedResponse;
-using System.Net;
 using Taran.Shared.Infrastructure.Configurations;
+using Taran.Shared.Language;
+using Taran.Shared.Languages;
 
 namespace Taran.Shared.Api;
 
@@ -63,6 +64,26 @@ public static class Extentions
             services.AddScoped<ICalendar, GeorgianCalendar>();
             DateAttribute.Calendar = new GeorgianCalendar();
         }
+
+        return services;
+    }
+
+    public static IServiceCollection InitTranslator(this IServiceCollection services, IConfigurationRoot configuration)
+    {
+        var cultureConfigurationSection = configuration.GetSection(nameof(CultureConfiguration));
+        if (cultureConfigurationSection is null)
+            throw new ArgumentNullException(nameof(CultureConfiguration));
+
+        CultureConfiguration cultureConfiguration = new();
+        cultureConfigurationSection.Bind(cultureConfiguration);
+
+        var languagePacksPath = Path.Combine(AppContext.BaseDirectory, "Resources", "Languages");
+        if (Directory.GetFiles(languagePacksPath, "*.yml").Count() == 0)
+            throw new FileNotFoundException(languagePacksPath);
+
+        services.AddSingleton<ITranslator>(
+            new TranslatorForBackend(cultureConfiguration, languagePacksPath)
+        );
 
         return services;
     }

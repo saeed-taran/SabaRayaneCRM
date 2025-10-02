@@ -52,5 +52,19 @@ public enum KeyWords
     DaysUntilAgreementExpire,
     MessageTemplates,
     NewTemplate,
-    Save
+    Save,
+    UploadedFileContainsNoRows,
+    UploadedFileContainsNoColumns,
+    CantRetrieveColumnHeaderName,
+    DownloadImportFileTemplate,
+    PleaseSelectAFileToImport,
+    OperationDoneSuccessfully,
+    Import,
+    ErrorMessages,
+    RowNumber,
+    ColumnName,
+    ErrorMessage,
+    Done,
+    TotalCount,
+    ImportingCurrencyPrice
 }

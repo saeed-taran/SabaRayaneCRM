@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
 using MudBlazor.Services;
-using Taran.Shared.UI.Languages;
 using Taran.UI.Main;
 using Taran.Shared.UI.Services;
 using Taran.Shared.UI.Services.HttpService;
@@ -12,8 +11,9 @@ using Taran.Shared.Dtos.Services.Calendar;
 using Taran.Shared.UI.Extensions;
 using Taran.Shared.UI.Auth;
 using Taran.Shared.UI.ConfigurationModels;
-using Taran.Shared.Dtos.ConfigurationModels;
 using Taran.UI.Main.Services.IdentityServices;
+using Taran.Shared.Languages;
+using Taran.Shared.Language;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -30,7 +30,7 @@ builder.Services.AddScoped(sp => configuration.GetSection(nameof(CultureConfigur
 builder.Services.AddMudServices();
 
 builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
-builder.Services.AddScoped<ITranslator, Translator>();
+builder.Services.AddScoped<ITranslator, TranslatorForFront>();
 
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");

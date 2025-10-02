@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\Taran.Shared.Dto\Taran.Shared.Dtos.csproj" />
+    <ProjectReference Include="..\..\Shared\Taran.Shared.Language\Taran.Shared.Language.csproj" />
   </ItemGroup>
 
 </Project>

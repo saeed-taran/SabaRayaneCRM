@@ -1,6 +1,8 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using SabaRayane.Contract.Application.Commands.s.Products;
 using SabaRayane.Contract.Core.Aggregates.ProductAggregate;
+using SabaRayane.Contract.Core.Specifications.Products.Products;
 using Taran.Shared.Core.Exceptions;
 using Taran.Shared.Core.Repository;
 
@@ -20,6 +22,11 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
 
     public async Task<bool> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
+        var existingProduct = await productReadRepository.FindWithSpecification(new ExistanceCheckProductSpecification(request.Name))
+            .FirstOrDefaultAsync(p => p.Id != request.Id, cancellationToken);
+        if (existingProduct is not null)
+            throw new DomainEntityAlreadyExistsException();
+
         var product = await productWriteRepository.GetByIdAsync(request.Id) ?? throw new DomainEntityNotFoundException(nameof(Product));
         product.Update(request.GetUserId(), request.Name, request.Price, request.Description);
 

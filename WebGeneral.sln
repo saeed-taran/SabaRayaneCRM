@@ -66,6 +66,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabaRayane.Notification.Dto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabaRayane.Notification.Api", "Notification\SabaRayane.Notification.Api\SabaRayane.Notification.Api.csproj", "{17B19ACB-77BA-437F-6A05-DC1BF83B75FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taran.Shared.Language", "Shared\Taran.Shared.Language\Taran.Shared.Language.csproj", "{F0350330-2802-DDC9-6781-0010EF3AF7A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -156,6 +158,10 @@ Global
 		{17B19ACB-77BA-437F-6A05-DC1BF83B75FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17B19ACB-77BA-437F-6A05-DC1BF83B75FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17B19ACB-77BA-437F-6A05-DC1BF83B75FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0350330-2802-DDC9-6781-0010EF3AF7A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0350330-2802-DDC9-6781-0010EF3AF7A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0350330-2802-DDC9-6781-0010EF3AF7A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0350330-2802-DDC9-6781-0010EF3AF7A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -183,6 +189,7 @@ Global
 		{F9306A0C-DC3E-672E-1565-F690CF143799} = {B6C54BD2-297E-45AB-8983-37A20B4AAEA2}
 		{63D9A489-9358-D920-3CD1-DD6C921A1056} = {B6C54BD2-297E-45AB-8983-37A20B4AAEA2}
 		{17B19ACB-77BA-437F-6A05-DC1BF83B75FC} = {B6C54BD2-297E-45AB-8983-37A20B4AAEA2}
+		{F0350330-2802-DDC9-6781-0010EF3AF7A9} = {357FA920-3A7C-49B2-82B1-EB79DCA99EA2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FD066904-97FB-4D0E-B216-65B1989C63C0}

@@ -1,0 +1,63 @@
+﻿@using Microsoft.AspNetCore.Http.Connections
+@using Microsoft.AspNetCore.SignalR.Client
+@using SabaRayane.Notification.Dtos.NotificationClient
+@using SabaRayane.Notification.Dtos.Progress
+@using Taran.Shared.Language
+@using Taran.Shared.Languages
+
+@implements IAsyncDisposable
+
+<div>
+    @foreach (var task in TasksSattusDictionary)
+    {
+        <div class="progress bg-dark">
+            <div class="progress-bar progress-bar-striped bg-primary progress-bar-animated" role="progressbar" aria-valuenow="@task.Value.DonePercentage" aria-valuemin="0" aria-valuemax="100" style="width: @task.Value.DonePercentage%"></div>
+            <div class="progress-bar progress-bar-striped bg-danger progress-bar-animated" role="progressbar" aria-valuenow="@task.Value.ErrorPercentage" aria-valuemin="0" aria-valuemax="100" style="width: @task.Value.ErrorPercentage%"></div>
+
+            @if (task.Value.IsDone)
+            {
+                <button @onclick=@(() => { RemoveTask(task.Key); }) class="text-white closeBtn position-absolute ms-1 justify-content-center d-flex">
+                    <i class="fas fa-times"></i>
+                </button>
+            }
+            <small class="text-white position-absolute ms-3 justify-content-center d-flex">@translator.Translate(task.Value.TaskName) @task.Value.TotalPercentage%</small>
+        </div>
+    }
+</div>
+
+@code
+{
+    private HubConnection? _hubConnection;
+    private Dictionary<string, PushTaskStatusDto> TasksSattusDictionary = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(new Uri($"{navConfig.Notification}/notifications"), options =>
+            {
+                options.Transports = HttpTransportType.WebSockets;
+                options.SkipNegotiation = true;
+            }).Build();
+
+        _hubConnection.On<PushTaskStatusDto>(nameof(INotificationClient.PushTaskStatus), taskStatus =>
+        {
+            TasksSattusDictionary[taskStatus.TaskName] = taskStatus;
+            InvokeAsync(StateHasChanged);
+        });
+
+        await _hubConnection.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+
+    private void RemoveTask(string taskName)
+    {
+        TasksSattusDictionary.Remove(taskName);
+    }
+}

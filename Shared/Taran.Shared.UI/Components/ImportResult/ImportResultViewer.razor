@@ -1,0 +1,65 @@
+﻿@using Taran.Shared.Dtos.Dtos.IO
+@using Taran.Shared.Dtos.Languages
+@using Taran.Shared.Language
+@using Taran.Shared.Languages
+
+@if (ImportDataResponseDto is not null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="text-danger">
+                    @translator.Translate(nameof(KeyWords.Error)):
+                    @ImportDataResponseDto.Error.ToString("#,##0")
+                </th>
+                <th class="text-success">
+                    @translator.Translate(nameof(KeyWords.Done)):
+                    @ImportDataResponseDto.Done.ToString("#,##0")
+                </th>
+                <th class="text-primary">
+                    @translator.Translate(nameof(KeyWords.TotalCount)):
+                    @((ImportDataResponseDto.Done + ImportDataResponseDto.Error).ToString("#,##0"))
+                </th>
+            </tr>
+        </thead>
+    </table>
+
+    @if (ImportDataResponseDto.Error > 0)
+    {
+        <div class="bg-danger p-2 text-white">
+            @translator.Translate(nameof(KeyWords.ErrorMessages))
+        </div>
+
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>@translator.Translate(nameof(KeyWords.RowNumber))</th>
+                    <th>@translator.Translate(nameof(KeyWords.ColumnName))</th>
+                    <th>@translator.Translate(nameof(KeyWords.ErrorMessage))</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var error in ImportDataResponseDto.ErrorMessages)
+                {
+                    <tr>
+                        <td>@error.RowNumber</td>
+                        <td>@translator.Translate(error.FieldName)</td>
+                        <td>@translator.Translate(error.Error)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    [Parameter]
+    public ImportDataResponseDto ImportDataResponseDto { get; set; }
+
+    public void Refresh(ImportDataResponseDto importDataResponseDto)
+    {
+        ImportDataResponseDto = importDataResponseDto;
+
+        StateHasChanged();
+    }
+}

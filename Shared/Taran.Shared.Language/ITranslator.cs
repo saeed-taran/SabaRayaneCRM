@@ -1,5 +1,5 @@
 ﻿
-namespace Taran.Shared.UI.Languages
+namespace Taran.Shared.Languages
 {
     public interface ITranslator
     {

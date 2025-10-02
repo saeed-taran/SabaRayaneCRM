@@ -1,4 +1,5 @@
-﻿using Taran.Shared.Dtos.WrappedResponse;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Taran.Shared.Dtos.WrappedResponse;
 
 namespace Taran.Shared.UI.Services.HttpService
 {
@@ -10,5 +11,6 @@ namespace Taran.Shared.UI.Services.HttpService
         Task<BackendResponse<Response>> Post<Response>(string url);
         Task<BackendResponse<Response>> Put<Request, Response>(string url, Request request);
         Task<BackendResponse<Response>> Delete<Response>(string url);
+        Task<BackendResponse<Response>> UploadFile<Response>(string url, IBrowserFile browserFile);
     }
 }

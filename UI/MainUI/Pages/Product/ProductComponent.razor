@@ -2,10 +2,29 @@
 
 @using SabaRayane.Contract.Dtos.s.Products
 @using Taran.Shared.Dtos.Languages
+@using Taran.Shared.Language
+@using Taran.Shared.Languages
+@using Taran.Shared.UI.Components.Bootstrap.Modal
 @using Taran.Shared.UI.Components.CustomizedQuickGrid
 @using Taran.Shared.UI.Components.CustomizedQuickGrid.Columns
+@using Taran.Shared.UI.Components.ImportResult
 @using Taran.UI.Main.Services.ProductServices
 @inject IProductService productService;
+
+<div class="border-bottom pb-3 pt-2 opacityBg">
+    <a class="btn btn-sm ms-2 border text-dark" href="@productService.GetProductImportTemplateDownloadLink()">
+        <i class="fas fa-table text-primary"></i>
+        @translator.Translate(nameof(KeyWords.DownloadImportFileTemplate))
+    </a>
+
+    <InputFile OnChange=FileSelected accept=".xlsx" class="ms-4" />
+
+    <button @onclick=ImportFile class="btn btn-sm ms-2 border text-dark">
+        <i class="fas fa-upload text-dark"></i>
+        @translator.Translate(nameof(KeyWords.Import))
+    </button>
+</div>
+<hr />
 
 <QuickGrid Id="ProductGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchProductResponseDto" Pagination="@pagination" @ref="grid" OnSaveEdit="SaveInlineEdit" EditingObjectType="typeof(UpdateProductRequestDto)" OnSaveNew="SaveInlineCreate" CreatingObjectType="typeof(CreateProductRequestDto)" OnDelete="OnItemDelete" Class="table table-borderless" Theme="none">
     <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Name))" Property="@(c => c.Name)"
@@ -35,16 +54,25 @@
     </div>
 </div>
 
+<BootstrapModal Id="ImportReportModal" BooststrapModalSize="BooststrapModalSize.lg" @ref=ImportReportModal>
+    <Body>
+        <ImportResultViewer @ref=importResultViewer></ImportResultViewer>
+    </Body>
+</BootstrapModal>
+
 @code {
     QuickGrid<SearchProductResponseDto>? grid;
     GridItemsProvider<SearchProductResponseDto>? GridItemsProvider;
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
     SearchProductRequestDto searchRequest = new();
 
+    IBrowserFile? selectedFile;
+
+    BootstrapModal ImportReportModal;
+    ImportResultViewer importResultViewer;
+
     protected override async Task OnInitializedAsync()
     {
-        
-
         GridItemsProvider = async req =>
         {
             searchRequest.Skip = req.StartIndex;
@@ -80,6 +108,40 @@
         var request = (CreateProductRequestDto)createRequestDto;
         var result = await productService.CreateProduct(request);
         return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+
+    protected async Task FileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    protected async Task ImportFile()
+    {
+        if (selectedFile is null)
+        {
+            await toastService.Show(translator.Translate(nameof(KeyWords.PleaseSelectAFileToImport)), ToastKind.danger);
+            return;
+        }
+
+        var response = await productService.ImportProduct(selectedFile);
+        if (response.Success)
+        {
+            if (response.Data.Error > 0)
+            {
+                importResultViewer.Refresh(response.Data);
+                await ImportReportModal.Open();
+            }
+            else
+            {
+                await toastService.Show(translator.Translate(nameof(KeyWords.OperationDoneSuccessfully)), ToastKind.success);
+            }
+
+            await grid!.RefreshDataAsync();
+        }
+        else if (!string.IsNullOrWhiteSpace(response.ErrorMessage))
+        {
+            await toastService.Show(response.ErrorMessage, ToastKind.danger);
+        }
     }
 }
 

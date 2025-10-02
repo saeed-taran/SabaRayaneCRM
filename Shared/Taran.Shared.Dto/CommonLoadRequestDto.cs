@@ -1,5 +1,5 @@
-﻿using Taran.Shared.Dtos.Languages;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Taran.Shared.Dtos.Languages;
 
 namespace Taran.Shared.Dtos;
 

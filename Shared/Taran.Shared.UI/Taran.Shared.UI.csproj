@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="5.9.12" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.7" />

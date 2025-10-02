@@ -1,4 +1,6 @@
-﻿using SabaRayane.Contract.Dtos.s.Products;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using SabaRayane.Contract.Dtos.s.Products;
+using Taran.Shared.Dtos.Dtos.IO;
 using Taran.Shared.Dtos;
 using Taran.Shared.Dtos.WrappedResponse;
 using Taran.Shared.UI.ConfigurationModels;
@@ -23,6 +25,16 @@ public class ProductService : ServiceBase, IProductService
             baseUrl,
             searchRequest
         );
+    }
+
+    public string GetProductImportTemplateDownloadLink()
+    {
+        return baseUrl + $"/importTemplate";
+    }
+
+    public async Task<BackendResponse<ImportDataResponseDto>> ImportProduct(IBrowserFile browserFile)
+    {
+        return await httpService.UploadFile<ImportDataResponseDto>(baseUrl + $"/import", browserFile);
     }
 
     public async Task<BackendResponse<bool?>> CreateProduct(CreateProductRequestDto createRequestDto)

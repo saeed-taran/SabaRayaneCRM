@@ -1,14 +1,14 @@
 ﻿using AKSoftware.Localization.MultiLanguages;
-using Taran.Shared.Dtos.ConfigurationModels;
+using Taran.Shared.Language;
 
-namespace Taran.Shared.UI.Languages;
+namespace Taran.Shared.Languages;
 
-public class Translator : ITranslator
+public class TranslatorForFront : ITranslator
 {
     private readonly ILanguageContainerService languageService;
     public Language CurrentLanguage { get; private set; } = Language.EnglishUs;
 
-    public Translator(ILanguageContainerService languageService, CultureConfiguration cultureConfiguration)
+    public TranslatorForFront(ILanguageContainerService languageService, CultureConfiguration cultureConfiguration)
     {
         this.languageService = languageService;
 

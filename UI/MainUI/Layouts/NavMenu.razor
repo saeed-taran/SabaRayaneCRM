@@ -1,7 +1,9 @@
-﻿@using Taran.UI.Main.Services.IdentityServices
-@using Taran.Identity.Access
+﻿@using Taran.Identity.Access
 @using Taran.Shared.Dtos.Languages
+@using Taran.Shared.Language
+@using Taran.Shared.Languages
 @using Taran.Shared.UI.Components.Link
+@using Taran.UI.Main.Services.IdentityServices
 
 @inject IRoleService roleService
 
@@ -73,6 +75,10 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="accordion-item p-3">
+            <NotificationDIsplayer></NotificationDIsplayer>
         </div>
 
     </div>

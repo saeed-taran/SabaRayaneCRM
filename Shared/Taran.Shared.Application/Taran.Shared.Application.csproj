@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EPPlus" Version="8.2.0" />
     <PackageReference Include="MediatR" Version="12.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Notification\SabaRayane.Notification.BackendService\SabaRayane.Notification.BackendService.csproj" />
+    <ProjectReference Include="..\Taran.Shared.Core\Taran.Shared.Core.csproj" />
+    <ProjectReference Include="..\Taran.Shared.Dto\Taran.Shared.Dtos.csproj" />
+    <ProjectReference Include="..\Taran.Shared.Language\Taran.Shared.Language.csproj" />
   </ItemGroup>
 
 </Project>

@@ -19,10 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Identity\Taran.Identity.Access\Taran.Identity.Access.csproj" />
     <ProjectReference Include="..\..\Shared\Taran.Shared.Api\Taran.Shared.Api.csproj" />
     <ProjectReference Include="..\..\Taran.Infrastructure\Taran.Infrastructure.csproj" />

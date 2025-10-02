@@ -31,6 +31,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.7" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="MudBlazor" Version="7.15.0" />
   </ItemGroup>
@@ -75,7 +76,9 @@
     <ProjectReference Include="..\..\Contract\SabaRayane.Contract.Dtos\SabaRayane.Contract.Dtos.csproj" />
     <ProjectReference Include="..\..\Identity\Taran.Identity.Access\Taran.Identity.Access.csproj" />
     <ProjectReference Include="..\..\Identity\Taran.Identity.Dtos\Taran.Identity.Dtos.csproj" />
+    <ProjectReference Include="..\..\Notification\SabaRayane.Notification.Dtos\SabaRayane.Notification.Dtos.csproj" />
     <ProjectReference Include="..\..\Shared\Taran.Shared.Dto\Taran.Shared.Dtos.csproj" />
+    <ProjectReference Include="..\..\Shared\Taran.Shared.Language\Taran.Shared.Language.csproj" />
     <ProjectReference Include="..\..\Shared\Taran.Shared.UI\Taran.Shared.UI.csproj" />
   </ItemGroup>
 

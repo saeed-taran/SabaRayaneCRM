@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
+using SabaRayane.Contract.Application.Commands.s.Customers;
+using SabaRayane.Notification.BackendService;
+using Taran.Shared.Application.Queries.IO;
+using Taran.Shared.Application.Services.IO;
 using Taran.Infrastructure;
 using Taran.Shared.Api;
-using Taran.Shared.Infrastructure.Repositories;
 using Taran.Shared.Core.Repository;
-using SabaRayane.Contract.Application.Commands.s.Customers;
-using Taran.Shared.Dtos.Services.Calendar;
+using Taran.Shared.Infrastructure.Repositories;
+using Taran.Shared.Languages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +27,7 @@ builder.Services.AddDbContext<MainDbContext>(options =>
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblyContaining(typeof(CreateCustomerCommand));
+    cfg.RegisterServicesFromAssemblyContaining(typeof(GetImportTemplateQuery));
 });
 
 builder.Services.AddControllers();
@@ -31,12 +35,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenWithAuthorize();
 
+builder.Services.AddNotificationService(configuration);
+
 builder.Services.InitCalendar(configuration);
+builder.Services.InitTranslator(configuration);
 
 /*Registering Services*/
 builder.Services.AddScoped<DbContext, MainDbContext>();
 builder.Services.AddScoped(typeof(IGenericReadRepository<,>), typeof(GenericReadRepository<,>));
 builder.Services.AddScoped(typeof(IGenericWriteRepository<,>), typeof(GenericWriteRepository<,>));
+builder.Services.AddScoped<IExcelService, ExcelService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 /*************Registering Services*/
 

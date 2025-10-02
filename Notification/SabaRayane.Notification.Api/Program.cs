@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.SignalR;
 using SabaRayane.Notification.Api;
 using Taran.Shared.Api;
 
@@ -10,6 +11,7 @@ builder.Services.AddMemoryCache();
 
 builder.Services.AddCorsPolicy();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
 
 builder.Services.AddCustomeAuthentication(configuration);
 

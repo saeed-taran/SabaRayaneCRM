@@ -14,4 +14,9 @@
     <Optimize>False</Optimize>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Taran.Shared.Language\ShakaSystem.Shared.Language.csproj" />
+    <ProjectReference Include="..\Taran.Shared.Language\Taran.Shared.Language.csproj" />
+  </ItemGroup>
+
 </Project>
