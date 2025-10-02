@@ -293,6 +293,11 @@ input::-webkit-calendar-picker-indicator {
         border-color: transparent rgb(21,31,56) transparent transparent;
     }
 
+.sidebar {
+    overflow: hidden;
+    transition: width 0.3s cubic-bezier(0.4, 0, 1, 1);
+}
+
 @font-face {
     font-family: IRANSans;
     font-style: normal;

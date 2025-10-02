@@ -39,10 +39,12 @@
 
         <div class="page">
             <div id="menuBar" class="sidebar border-end">
-                <span class="position-absolute end-0 p-3 text-white" style="z-index:10;" role="button" onclick="toggleMenuBar();">
-                    <i class="fas fa-times fa-fw"></i>
-                </span>
-                <NavMenu @ref=navMenu />
+                <div id="innerMenuBar">
+                    <span class="position-absolute end-0 p-3 text-white" style="z-index:10;" role="button" onclick="toggleMenuBar();">
+                        <i class="fas fa-times fa-fw"></i>
+                    </span>
+                    <NavMenu @ref=navMenu />
+                </div>
             </div>
 
             <main>
@@ -79,47 +81,6 @@
             <a href="" class="reload">Reload</a>
             <a class="dismiss">🗙</a>
         </div>
-
-        <script>
-            var menuIsHidden = false;
-            var profileContextMenuIsHidden = true;
-
-            function toggleMenuBar() {
-                companyNameLablePaddingClass = "ps-4";
-                if (menuIsHidden) {
-                    $('#menuBar').css('display', 'block');
-                    $('#restoreMenuButton').addClass('d-none');
-                    $('#companyNameLable').removeClass(companyNameLablePaddingClass);
-                }
-                else {
-                    $('#menuBar').css('display', 'none');
-                    $('#restoreMenuButton').removeClass('d-none');
-                    $('#companyNameLable').addClass(companyNameLablePaddingClass);
-                }
-
-                menuIsHidden = !menuIsHidden;
-            }
-
-            function toggleProfileContextMenu() { 
-                if (profileContextMenuIsHidden) {
-                    $("#profileContextMenu").removeClass("d-none");
-                }
-                else {
-                    $("#profileContextMenu").addClass("d-none");
-                }
-
-                profileContextMenuIsHidden = !profileContextMenuIsHidden;
-            }
-
-            $(document).ready(function () {
-                $(document).click(function (event) {
-                    if ($(event.target).closest('#profileToggleIcon').length === 0) {
-                        $("#profileContextMenu").addClass("d-none");
-                        profileContextMenuIsHidden = true;
-                    }
-                });
-            });
-        </script>
 
     </Authorized>
     <NotAuthorized>
@@ -161,6 +122,10 @@
 
             await jsRuntime.InvokeVoidAsync("setDateTimeKind", cultureConfiguration.DateTime);
             await jsRuntime.InvokeVoidAsync("initDatePickers", "DateInput");
+
+            var currentUrl = navigationManager.ToBaseRelativePath(navigationManager.Uri);
+
+            await jsRuntime.InvokeVoidAsync($"collapseAccordionByHref", currentUrl);
         }
     }
 }

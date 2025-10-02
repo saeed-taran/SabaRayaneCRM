@@ -7,7 +7,7 @@ using Taran.Identity.Core.Aggregates.UserAggregate;
 using Taran.Infrastructure;
 using Taran.Shared.Application.Services.Security;
 
-namespace ShakaSystem.Infrastructure;
+namespace SabaRayane.Infrastructure;
 
 public static class SeedData
 {
