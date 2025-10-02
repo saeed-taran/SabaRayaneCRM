@@ -1,2 +1,64 @@
-﻿IdIsMissing: شناسه ارسال نشده
+﻿IdIsMissing: شناسه وارد نشده
 Return: بازگشت
+Cancel: انصراف
+Submit: تایید
+SubmitAndNew: تایید و جدید
+Items: آیتم ها
+Page: صفحه
+Of: از
+Create: جدید
+Error: خطا
+DoYouWantToDeleteThisItem: آیا میخواهید این آیتم را حذف نمایید؟
+UnknownError: خطای ناشناس
+FieldIsRequired: آیتم اجباری است
+MaximumLengthExceeded: طول بیش از حداکثر مجاز می باشد
+PasswordLengthDoesNotMatch: طول رمز عبور مطابقت ندارد
+Role: نقش
+RoleAccess: دسترسی
+User: کاربر
+InvalidUserNameOrPassword: نام کاربری یا رمز عبور صحیح نمی باشد
+CompanyName: نام شرکت
+IdentityManagement: مدیریت کاربران
+UnhandledErrorOccured: خطای ناشناخته
+DoYouWantToLogOut: آیا میخواهید خارج شوید؟
+LogOut: خروج
+CustomerId: شناسه مشتری
+FirstName: نام
+LastName: نام خانوادگی
+StoreName: نام فروشگاه
+MobileNumber: شماره موبایل
+Description: توضیحات
+ItemsPerPage: آیتم در هر صفحه
+UserName: نام کاربری
+Password: رمز عبور
+Login: ورود
+Contracts: قراردادها
+Customers: مشتریان
+Name: عنوان
+Price: قیمت
+Products: محصولات
+Customer: مشتری
+Product: محصول
+AgreementDate: تاریخ قرارداد
+DurationInMonths: طول به ماه
+ExtraUsersCount: تعداد کاربران اضافی
+Agreement: قرارداد
+Yes: بله
+Message: پیام
+DaysUntilAgreementExpire: DaysUntilAgreementExpire
+MessageTemplates: قالب پیام
+NewTemplate: قالب جدید
+Save: ذخیره
+UploadedFileContainsNoRows: UploadedFileContainsNoRows
+UploadedFileContainsNoColumns: UploadedFileContainsNoColumns
+CantRetrieveColumnHeaderName: CantRetrieveColumnHeaderName
+DownloadImportFileTemplate: دانلود فایل قالب
+PleaseSelectAFileToImport: PleaseSelectAFileToImport
+OperationDoneSuccessfully: OperationDoneSuccessfully
+Import: بارگزاری
+ErrorMessages: پیام های خطا
+RowNumber: شماره سطر
+ColumnName: نام ستون
+ErrorMessage: پیام خطا
+Done: انجام شده
+TotalCount: تعداد کل

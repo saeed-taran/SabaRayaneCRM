@@ -68,6 +68,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabaRayane.Notification.Api
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taran.Shared.Language", "Shared\Taran.Shared.Language\Taran.Shared.Language.csproj", "{F0350330-2802-DDC9-6781-0010EF3AF7A9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{046AF360-7FF2-477F-97EF-1F422FAB7546}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Desktop\UpWork\Culture.png = ..\..\..\Desktop\UpWork\Culture.png
+		..\..\..\Desktop\UpWork\Grid Validation.png = ..\..\..\Desktop\UpWork\Grid Validation.png
+		..\..\..\Desktop\UpWork\Import and notification.gif = ..\..\..\Desktop\UpWork\Import and notification.gif
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

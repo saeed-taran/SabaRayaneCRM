@@ -48,7 +48,7 @@ public class ImportDataCommandHandler<CreateCommandType> : IRequestHandler<Impor
                 var headers = new List<string>();
                 for (int col = 1; col <= colCount; col++)
                 {
-                    var headerText = worksheet.Cells[1, col].Comment.Text;
+                    var headerText = worksheet.Cells[1, col]?.Comment?.Text;
                     if(string.IsNullOrEmpty(headerText))
                         throw new DomainInvalidOperationException(nameof(KeyWords.CantRetrieveColumnHeaderName));
                     headers.Add(headerText);

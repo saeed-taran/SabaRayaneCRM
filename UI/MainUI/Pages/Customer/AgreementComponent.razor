@@ -17,10 +17,10 @@
 {
     <div class="mb-2">
         <a class="btn btn-warning text-black" href="/customer">
-            <span class="far fa-hand-point-right"></span>
+            <span class="far @(translator.CurrentLanguage.IsLeftToRight ? "fa-hand-point-left" : "fa-hand-point-right")"></span>
             @translator.Translate(nameof(KeyWords.Return))
         </a>
-
+        
         <span class="ms-3">
             @customer?.FullName
         </span>

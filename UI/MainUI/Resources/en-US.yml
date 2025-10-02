@@ -1,2 +1,64 @@
-﻿IdIsMissing: Id is not sent
+﻿IdIsMissing: Id is missing
 Return: Return
+Cancel: Cancel
+Submit: Submit
+SubmitAndNew: Submit And New
+Items: Items
+Page: Page
+Of: Of
+Create: Create
+Error: Error
+DoYouWantToDeleteThisItem: Do you want to delete this item
+UnknownError: Unknown error
+FieldIsRequired: Field is required
+MaximumLengthExceeded: Maximum length exceeded
+PasswordLengthDoesNotMatch: Password length does not match
+Role: Role
+RoleAccess: Role access
+User: User
+InvalidUserNameOrPassword: Invalid user name or password
+CompanyName: Company name
+IdentityManagement: IdentityManagement
+UnhandledErrorOccured: UnhandledErrorOccured
+DoYouWantToLogOut: DoYouWantToLogOut
+LogOut: Log out
+CustomerId: Customer id
+FirstName: FirstName
+LastName: LastName
+StoreName: StoreName
+MobileNumber: Mobile number
+Description: Description
+ItemsPerPage: Items per page
+UserName: UserName
+Password: Password
+Login: Login
+Contracts: Contracts
+Customers: Customers
+Name: Name
+Price: Price
+Products: Products
+Customer: Customer
+Product: Product
+AgreementDate: Agreement date
+DurationInMonths: Duration in months
+ExtraUsersCount: Extra users count
+Agreement: Agreement
+Yes: Yes
+Message: Message
+DaysUntilAgreementExpire: DaysUntilAgreementExpire
+MessageTemplates: Message templates
+NewTemplate: New template
+Save: Save
+UploadedFileContainsNoRows: UploadedFileContainsNoRows
+UploadedFileContainsNoColumns: UploadedFileContainsNoColumns
+CantRetrieveColumnHeaderName: Unable to retrieve column header name
+DownloadImportFileTemplate: Download import file template
+PleaseSelectAFileToImport: PleaseSelectAFileToImport
+OperationDoneSuccessfully: OperationDoneSuccessfully
+Import: Import
+ErrorMessages: ErrorMessages
+RowNumber: RowNumber
+ColumnName: ColumnName
+ErrorMessage: ErrorMessage
+Done: Done
+TotalCount: Total count

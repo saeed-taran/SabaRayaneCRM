@@ -24,8 +24,10 @@ var configuration = new ConfigurationBuilder()
     .AddJsonFile($"appsettings.{envName}.json", false)
     .Build();
 
+var cultureConfiguration = configuration.GetSection(nameof(CultureConfiguration)).Get<CultureConfiguration>();
+
 builder.Services.AddScoped(sp => configuration.GetSection(nameof(NavigationConfiguration)).Get<NavigationConfiguration>()!);
-builder.Services.AddScoped(sp => configuration.GetSection(nameof(CultureConfiguration)).Get<CultureConfiguration>()!);
+builder.Services.AddScoped(sp => cultureConfiguration!);
 
 builder.Services.AddMudServices();
 
@@ -40,7 +42,12 @@ builder.Services.AddScoped<HttpClient>();
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 builder.Services.AddScoped<ICookieStorageService, CookieStorageService>();
 builder.Services.AddScoped<IHttpService, HttpService>();
-builder.Services.AddScoped<ICalendar, PersianCalendar>();
+
+if(cultureConfiguration.DateTime == "Shamsi")
+    builder.Services.AddScoped<ICalendar, PersianCalendar>();
+else
+    builder.Services.AddScoped<ICalendar, GeorgianCalendar>();
+
 builder.Services.AddScoped<IToastService, ToastService>();
 
 builder.Services.AddServices(typeof(RoleService));

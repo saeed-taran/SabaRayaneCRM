@@ -73,10 +73,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        placeHolders.Add(new() { Title = "مشتری", Value="@Customer" });
-        placeHolders.Add(new() { Title = "فروشگاه", Value="@Store" });
-        placeHolders.Add(new() { Title = "قیمت", Value="@Price" });
-        placeHolders.Add(new() { Title = "تاریخ انقضاء", Value="@ExpireDate" });
+        placeHolders.Add(new() { Title = "Customer", Value="@Customer" });
+        placeHolders.Add(new() { Title = "Store", Value="@Store" });
+        placeHolders.Add(new() { Title = "Price", Value="@Price" });
+        placeHolders.Add(new() { Title = "Expire date", Value="@ExpireDate" });
 
         templateEditorThirdPartyComponent = new ThirdPartyComponent(async () => { await templateEditorModal.Open(); });
 
