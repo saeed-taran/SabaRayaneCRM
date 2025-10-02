@@ -71,4 +71,15 @@ This is a sample project created to demonstrate my programming skills and approa
 ## Screenshots / Visuals
 
 * **Data grid validation with DTO validation attributes:**
-![Inline Edit](docs/Grid Validation.png)
+  
+![Inline Edit](Docs/Grid%20Validation.png)
+
+
+* **Multi-Language Support:**
+  
+![Inline Edit](Docs/Culture.png)
+
+
+* **Import data and notify progress:**
+  
+![Inline Edit](Docs/Import%20and%20notification.gif)
