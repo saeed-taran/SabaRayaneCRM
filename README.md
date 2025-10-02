@@ -68,3 +68,7 @@ This is a sample project created to demonstrate my programming skills and approa
   * Contract Service: manages customer agreements.
   * Notification Service: handles real-time notifications.
 
+## Screenshots / Visuals
+
+* **Data grid validation with DTO validation attributes:**
+![Inline Edit](docs/Grid Validation.png)
