@@ -66,5 +66,5 @@ public enum KeyWords
     ErrorMessage,
     Done,
     TotalCount,
-    ImportingCurrencyPrice
+    ImportingProduct
 }

@@ -52,7 +52,7 @@ public class ProductController : AuthorizedControllerBase
     {
         ImportDataCommand<ImportProductCommand>
         importDataCommand = new(
-            nameof(KeyWords.ImportingCurrencyPrice),
+            nameof(KeyWords.ImportingProduct),
             notifyProgress: true,
             file.OpenReadStream(),
             (rowDictionary) =>
