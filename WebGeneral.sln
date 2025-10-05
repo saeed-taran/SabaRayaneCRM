@@ -75,6 +75,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{046AF360-7
 		Docs\Import and notification.gif = Docs\Import and notification.gif
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabaRayane.Contract.Infrastructure", "Contract\SabaRayane.Contract.Infrastructure\SabaRayane.Contract.Infrastructure.csproj", "{47F8E76D-AD00-407D-A76D-20D56E84B5CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -169,6 +171,10 @@ Global
 		{F0350330-2802-DDC9-6781-0010EF3AF7A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0350330-2802-DDC9-6781-0010EF3AF7A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0350330-2802-DDC9-6781-0010EF3AF7A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47F8E76D-AD00-407D-A76D-20D56E84B5CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47F8E76D-AD00-407D-A76D-20D56E84B5CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47F8E76D-AD00-407D-A76D-20D56E84B5CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47F8E76D-AD00-407D-A76D-20D56E84B5CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -197,6 +203,7 @@ Global
 		{63D9A489-9358-D920-3CD1-DD6C921A1056} = {B6C54BD2-297E-45AB-8983-37A20B4AAEA2}
 		{17B19ACB-77BA-437F-6A05-DC1BF83B75FC} = {B6C54BD2-297E-45AB-8983-37A20B4AAEA2}
 		{F0350330-2802-DDC9-6781-0010EF3AF7A9} = {357FA920-3A7C-49B2-82B1-EB79DCA99EA2}
+		{47F8E76D-AD00-407D-A76D-20D56E84B5CF} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FD066904-97FB-4D0E-B216-65B1989C63C0}

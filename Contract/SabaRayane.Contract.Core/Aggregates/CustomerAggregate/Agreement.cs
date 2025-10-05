@@ -1,5 +1,4 @@
 ﻿using SabaRayane.Contract.Core.Aggregates.ProductAggregate;
-using System.ComponentModel.DataAnnotations.Schema;
 using Taran.Shared.Core.Entity;
 using Taran.Shared.Core.Exceptions;
 
@@ -21,8 +20,10 @@ public class Agreement : BaseEntity<int>
 
     public int ExtraUsersCount { get; private set; }
 
-    [NotMapped]
-    public DateOnly ExpireDate => AgreementDate.AddMonths(DurationInMonths);
+    public DateOnly ExpireDate { get; private set; }
+
+    private List<Notification> notifications = [];
+    public IReadOnlyCollection<Notification> Notifications => notifications;
 
     internal Agreement(int creatorUserId, int productId, long price, DateOnly agreementDate, int durationInMonths, int extraUsersCount)
         : base(creatorUserId)
@@ -32,15 +33,24 @@ public class Agreement : BaseEntity<int>
         AgreementDate = agreementDate;
         DurationInMonths = durationInMonths > 0 ? durationInMonths : throw new DomainInvalidArgumentException(nameof(DurationInMonths));
         ExtraUsersCount = extraUsersCount >= 0 ? extraUsersCount : throw new DomainInvalidArgumentException(nameof(ExtraUsersCount));
+        ExpireDate = agreementDate.AddMonths(durationInMonths);
     }
 
-    public void Update(int userId, int productId, DateOnly agreementDate, int durationInMonths, int extraUsersCount) 
+    internal void Update(int userId, int productId, DateOnly agreementDate, int durationInMonths, int extraUsersCount) 
     {
         ProductId = productId;
         AgreementDate = agreementDate;
         DurationInMonths = durationInMonths > 0 ? durationInMonths : throw new DomainInvalidArgumentException(nameof(DurationInMonths));
         ExtraUsersCount = extraUsersCount >= 0 ? extraUsersCount : throw new DomainInvalidArgumentException(nameof(ExtraUsersCount));
+        ExpireDate = agreementDate.AddMonths(durationInMonths);
 
         Update(userId);
+    }
+
+    internal void AddNotification(int creatorUserId, int agreementId, int messageTemplateId, string message)
+    {
+        var notification = new Notification(creatorUserId, agreementId, messageTemplateId, message);
+
+        notifications.Add(notification);
     }
 }

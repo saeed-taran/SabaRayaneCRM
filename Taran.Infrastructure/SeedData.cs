@@ -38,11 +38,11 @@ public static class SeedData
             context.SaveChanges();
         }
 
-        foreach (var placeHolder in PlaceHolder.PlaceHolders) 
+        foreach (var kvp in PlaceHolder.PlaceHolders) 
         {
-            if (!context.PlaceHolder.Any(p => p.Id == placeHolder.Id))
+            if (!context.PlaceHolder.Any(p => p.Id == kvp.Value.Id))
             {
-                context.PlaceHolder.Add(placeHolder);
+                context.PlaceHolder.Add(kvp.Value);
             }
         }
 

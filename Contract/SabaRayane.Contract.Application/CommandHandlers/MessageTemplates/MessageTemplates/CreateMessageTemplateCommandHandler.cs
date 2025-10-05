@@ -1,6 +1,9 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using SabaRayane.Contract.Application.Commands.s.MessageTemplates;
 using SabaRayane.Contract.Core.Aggregates.MessageTemplateAggregate;
+using SabaRayane.Contract.Core.Specifications.MessageTemplates.MessageTemplates;
+using Taran.Shared.Core.Exceptions;
 using Taran.Shared.Core.Repository;
 
 namespace SabaRayane.Contract.Application.CommandHandlers.s.MessageTemplates;
@@ -19,6 +22,13 @@ public class CreateMessageTemplateCommandHandler : IRequestHandler<CreateMessage
 
     public async Task<bool> Handle(CreateMessageTemplateCommand request, CancellationToken cancellationToken)
     {
+        var existingMessageTemplate = await messageTemplateReadRepository.FindWithSpecification(
+            new ExistanceCheckMessageTemplateSpecification(request.DaysUntilAgreementExpire)
+        ).FirstOrDefaultAsync(cancellationToken);
+
+        if (existingMessageTemplate is not null)
+            throw new DomainEntityAlreadyExistsException();
+
         var newMessageTemplate = new MessageTemplate(request.GetUserId(), request.Name, request.Message, request.DaysUntilAgreementExpire);
         await messageTemplateWriteRepository.CreateAsync(newMessageTemplate);
 

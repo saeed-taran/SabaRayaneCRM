@@ -51,4 +51,17 @@ public class ServiceBase
         var dropDownItems = backendResponse.Data!.Results.Select(selector).ToList();
         return dropDownItems;
     }
+
+    protected List<(string, string)> _GetDropDownItems<Response>(BackendResponse<PaginatedResponseDto<Response>> backendResponse,
+        Func<Response, (string, string)> selector)
+    {
+        if (!backendResponse.Success)
+        {
+            ShowToastMessage(backendResponse.ErrorMessage, ToastKind.danger);
+            return new();
+        }
+
+        var dropDownItems = backendResponse.Data!.Results.Select(selector).ToList();
+        return dropDownItems;
+    }
 }

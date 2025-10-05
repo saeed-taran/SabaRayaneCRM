@@ -8,6 +8,7 @@ using Taran.Shared.Api;
 using Taran.Shared.Core.Repository;
 using Taran.Shared.Infrastructure.Repositories;
 using Taran.Shared.Languages;
+using SabaRayane.Contract.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,7 @@ builder.Services.AddScoped(typeof(IGenericReadRepository<,>), typeof(GenericRead
 builder.Services.AddScoped(typeof(IGenericWriteRepository<,>), typeof(GenericWriteRepository<,>));
 builder.Services.AddScoped<IExcelService, ExcelService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddHostedService<AgreementNotificationWorker>();
 /*************Registering Services*/
 
 var app = builder.Build();

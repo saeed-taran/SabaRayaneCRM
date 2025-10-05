@@ -87,4 +87,12 @@ public class Customer : AggregateRoot<int>
 
         agreements.Remove(agreement);
     }
+
+    public void AddNotification(int creatorUserId, int agreementId, int messageTemplateId, string message)
+    {
+        var agreement = agreements.FirstOrDefault(a => a.Id == agreementId)
+            ?? throw new DomainEntityNotFoundException(nameof(Agreement));
+
+        agreement.AddNotification(creatorUserId, agreementId, messageTemplateId, message);
+    }
 }

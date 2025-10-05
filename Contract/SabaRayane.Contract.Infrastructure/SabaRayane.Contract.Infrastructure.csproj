@@ -7,9 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\Taran.Shared.Application\Taran.Shared.Application.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\Taran.Shared.Core\Taran.Shared.Core.csproj" />
+    <ProjectReference Include="..\SabaRayane.Contract.Application\SabaRayane.Contract.Application.csproj" />
     <ProjectReference Include="..\SabaRayane.Contract.Core\SabaRayane.Contract.Core.csproj" />
-    <ProjectReference Include="..\SabaRayane.Contract.Dtos\SabaRayane.Contract.Dtos.csproj" />
   </ItemGroup>
 
 </Project>

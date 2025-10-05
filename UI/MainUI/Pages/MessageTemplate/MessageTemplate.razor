@@ -73,10 +73,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        placeHolders.Add(new() { Title = "Customer", Value="@Customer" });
-        placeHolders.Add(new() { Title = "Store", Value="@Store" });
-        placeHolders.Add(new() { Title = "Price", Value="@Price" });
-        placeHolders.Add(new() { Title = "Expire date", Value="@ExpireDate" });
+        var placeHolderDropDownItems = await messageTemplateService.GetPlaceHolderDropDownItems();
+        placeHolders.AddRange(placeHolderDropDownItems.Select(d => new PlaceHolderModel() { Title = d.Item1, Value = d.Item2 }));
 
         templateEditorThirdPartyComponent = new ThirdPartyComponent(async () => { await templateEditorModal.Open(); });
 

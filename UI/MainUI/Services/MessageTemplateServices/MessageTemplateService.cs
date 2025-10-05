@@ -1,4 +1,5 @@
-﻿using SabaRayane.Contract.Dtos.s.MessageTemplates;
+﻿using SabaRayane.Contract.Dtos.MessageTemplates.PlaceHolders;
+using SabaRayane.Contract.Dtos.s.MessageTemplates;
 using Taran.Shared.Dtos;
 using Taran.Shared.Dtos.WrappedResponse;
 using Taran.Shared.UI.ConfigurationModels;
@@ -54,4 +55,12 @@ public class MessageTemplateService : ServiceBase, IMessageTemplateService
     }
     #endregion
 
+    public async Task<List<(string, string)>> GetPlaceHolderDropDownItems()
+    {
+        var placeHolders = await httpService.Get<PaginatedResponseDto<SearchPlaceHolderResponseDto>>(
+            baseUrl + "/PlaceHolder"
+        );
+
+        return _GetDropDownItems(placeHolders, c => (c.Title, c.Name));
+    }
 }

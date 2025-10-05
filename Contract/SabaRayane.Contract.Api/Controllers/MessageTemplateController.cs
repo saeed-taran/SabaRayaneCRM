@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SabaRayane.Contract.Application.Commands.s.MessageTemplates;
+using SabaRayane.Contract.Application.Queries.MessageTemplates.PlaceHolders;
 using SabaRayane.Contract.Application.Queries.s.MessageTemplates;
 using Taran.Identity.Access;
 using Taran.Shared.Api.Attributes;
@@ -22,7 +23,6 @@ public class MessageTemplateController : AuthorizedControllerBase
         this.mediator = mediator;
         this.appUser = appUser;
     }
-
 
     #region MessageTemplate actions
     [HttpGet]
@@ -54,4 +54,9 @@ public class MessageTemplateController : AuthorizedControllerBase
     }
     #endregion
 
+    [HttpGet("PlaceHolder")]
+    public async Task<ActionResult> Get()
+    {
+        return Ok(await SendQuery(new SearchPlaceHolderQuery()));
+    }
 }

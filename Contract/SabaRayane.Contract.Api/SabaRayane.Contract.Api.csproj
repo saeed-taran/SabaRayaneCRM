@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\Shared\Taran.Shared.Api\Taran.Shared.Api.csproj" />
     <ProjectReference Include="..\..\Taran.Infrastructure\Taran.Infrastructure.csproj" />
     <ProjectReference Include="..\SabaRayane.Contract.Application\SabaRayane.Contract.Application.csproj" />
+    <ProjectReference Include="..\SabaRayane.Contract.Infrastructure\SabaRayane.Contract.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
