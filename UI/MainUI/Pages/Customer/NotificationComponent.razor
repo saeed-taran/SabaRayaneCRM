@@ -1,0 +1,84 @@
+﻿@page "/notification"
+
+@using SabaRayane.Contract.Dtos.Customers.CustomerAggregate
+@using Taran.Shared.Dtos.Languages
+@using Taran.Shared.UI.Components.CustomizedQuickGrid
+@using Taran.Shared.UI.Components.CustomizedQuickGrid.Columns
+@using Taran.UI.Main.Services.CustomerServices
+@using Taran.UI.Main.Services.MessageTemplateServices
+
+@inject ICustomerService customerService;
+@inject IMessageTemplateService messageTemplateService;
+
+<QuickGrid Id="NotificationGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchNotificationResponseDto" Pagination="@pagination" @ref="grid" Class="table table-borderless" Theme="none">
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.Message))" Property="@(c => c.Message)"
+            EditTemplate="new EditTemplate(nameof(SearchNotificationResponseDto.Message))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.NotificationStatus))" Property="@(c => c.NotificationStatusTitle)"
+            EditTemplate="new EditTemplate(nameof(SearchNotificationResponseDto.NotificationStatusTitle))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.LastTryDate))" Property="@(c => c.LastTryDate)"
+            EditTemplate="new EditTemplate(nameof(SearchNotificationResponseDto.LastTryDate))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.TryCount))" Property="@(c => c.TryCount)"
+            EditTemplate="new EditTemplate(nameof(SearchNotificationResponseDto.TryCount))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.ErrorDescription))" Property="@(c => c.ErrorDescription)"
+            EditTemplate="new EditTemplate(nameof(SearchNotificationResponseDto.ErrorDescription))">
+    </PropertyColumn>
+    <PropertyColumn Title="@translator.Translate(nameof(KeyWords.MessageTemplate))" Property="@(c => c.MessageTemplateTitle)"
+            EditTemplate="new EditTemplate(nameof(SearchNotificationResponseDto.MessageTemplateId), MessageTemplateDropDownItems)">
+    </PropertyColumn>
+</QuickGrid>
+
+<div class="row bg-default">
+    <div class="col-8">
+        <Paginator State="@pagination" />
+    </div>
+    <div class="col-4">
+        <div class="d-inline float-end me-5">
+            @translator.Translate(nameof(KeyWords.ItemsPerPage))
+            <select @bind="@pagination.ItemsPerPage">
+                <option>10</option>
+                <option>15</option>
+                <option>20</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    QuickGrid<SearchNotificationResponseDto>? grid;
+    GridItemsProvider<SearchNotificationResponseDto>? GridItemsProvider;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    SearchNotificationRequestDto searchRequest = new();
+
+    List<(int, string)> MessageTemplateDropDownItems = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+                MessageTemplateDropDownItems = await messageTemplateService.GetMessageTemplateDropDownItems(0, 1000, "");
+
+
+        GridItemsProvider = async req =>
+        {
+            searchRequest.Skip = req.StartIndex;
+            searchRequest.Take = req.Count ?? 10;
+
+            var customersResponse = await customerService.SearchNotification(searchRequest);
+
+            return GridItemsProviderResult.From(
+                items: customersResponse.Data!.Results,
+                totalItemCount: customersResponse.Data.TotalCount);
+        };
+    }
+
+    protected async Task FilterChanged()
+    {
+        await grid!.RefreshDataAsync();
+    }
+}
+

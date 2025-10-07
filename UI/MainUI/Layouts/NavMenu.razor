@@ -9,7 +9,7 @@
 
 <div class="top-row ps-3 navbar navbar-dark company-brand">
     <div class="container-fluid">
-        <a class="navbar-brand" ref="">@translator.Translate(nameof(KeyWords.CompanyName))</a>
+        <a class="navbar-brand" ref="">صبا رایانه</a>
     </div>
 </div>
 
@@ -35,6 +35,11 @@
                     <div class="nav-item px-3">
                         <Link CssClass="nav-link" Enabled="@roleService.HaveAccess(AccessNames.Agreement_Get)" Href="agreement">
                             <MudBlazor.MudIcon Icon="@MudBlazor.Icons.Material.Filled.ReceiptLong"></MudBlazor.MudIcon> @translator.Translate(nameof(KeyWords.Agreement))
+                        </Link>
+                    </div>
+                    <div class="nav-item px-3">
+                        <Link CssClass="nav-link" Enabled="@roleService.HaveAccess(AccessNames.Notification_Get)" Href="notification">
+                        <MudBlazor.MudIcon Icon="@MudBlazor.Icons.Material.Filled.Notifications"></MudBlazor.MudIcon> @translator.Translate(nameof(KeyWords.Notifications))
                         </Link>
                     </div>
                 </div>

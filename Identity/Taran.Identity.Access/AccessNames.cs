@@ -30,4 +30,6 @@ public enum AccessNames
     MessageTemplate_Create = 21,
     MessageTemplate_Update = 22,
     MessageTemplate_Delete = 23,
+    
+    Notification_Get = 24,
 }

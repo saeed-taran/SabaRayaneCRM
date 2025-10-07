@@ -43,8 +43,8 @@ public class AuthorizedControllerBase : ControllerBase
 
     protected async Task<OutPut> SendInternalQuery<OutPut>(IQueryInternal<OutPut> query)
     {
-        if (!httpContextAccessor.HttpContext.Request.IsLocal())
-            throw new BadHttpRequestException("forbidden", (int)HttpStatusCode.Forbidden);
+        //if (!httpContextAccessor.HttpContext.Request.IsLocal())
+        //    throw new BadHttpRequestException("forbidden", (int)HttpStatusCode.Forbidden);
 
         return await mediator.Send(query);
     }

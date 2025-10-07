@@ -1,6 +1,6 @@
 ﻿var profileContextMenuIsHidden = true;
 
-$(document).ready(function () {
+function mainLayoutLoaded() {
     document.getElementById("menuBar").addEventListener("transitionend", menuBarTransitionEnd);
 
     $(document).click(function (event) {
@@ -9,7 +9,8 @@ $(document).ready(function () {
             profileContextMenuIsHidden = true;
         }
     });
-});
+}
+
 function menuBarTransitionEnd(e) {
     if ($("#menuBar").width() > 0) {
         $('#innerMenuBar').css("width", '');

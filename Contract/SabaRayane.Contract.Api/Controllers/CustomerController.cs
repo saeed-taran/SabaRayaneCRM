@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SabaRayane.Contract.Application.Commands.Customers.Agreements;
 using SabaRayane.Contract.Application.Commands.s.Customers;
 using SabaRayane.Contract.Application.Queries.Customers.Agreements;
+using SabaRayane.Contract.Application.Queries.Customers.CustomerAggregate;
 using SabaRayane.Contract.Application.Queries.s.Customers;
 using Taran.Identity.Access;
 using Taran.Shared.Api.Attributes;
@@ -83,6 +84,15 @@ public class CustomerController : AuthorizedControllerBase
     public async Task<ActionResult> Delete([FromRoute] DeleteAgreementCommand deleteAgreementCommand)
     {
         return Ok(await SendCommand(deleteAgreementCommand));
+    }
+    #endregion
+
+    #region Notification actions
+    [HttpGet("Notification")]
+    [CustomeAuthorize((int)AccessNames.Notification_Get)]
+    public async Task<ActionResult> Get([FromQuery] SearchNotificationQuery searchNotificationQuery)
+    {
+        return Ok(await SendQuery(searchNotificationQuery));
     }
     #endregion
 

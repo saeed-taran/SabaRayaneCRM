@@ -98,6 +98,7 @@
 
     protected async Task TemplateManagerSave(string template)
     {
+        Console.WriteLine(template);
         await templateEditorThirdPartyComponent.SetValue(template, template);
         await templateEditorModal.Close();
 

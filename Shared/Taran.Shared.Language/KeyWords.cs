@@ -66,5 +66,11 @@ public enum KeyWords
     ErrorMessage,
     Done,
     TotalCount,
-    ImportingProduct
+    ImportingProduct,
+    NotificationStatus,
+    LastTryDate,
+    TryCount,
+    ErrorDescription,
+    MessageTemplate,
+    Notifications
 }

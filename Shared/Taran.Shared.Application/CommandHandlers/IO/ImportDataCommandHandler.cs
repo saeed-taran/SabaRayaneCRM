@@ -117,8 +117,7 @@ public class ImportDataCommandHandler<CreateCommandType> : IRequestHandler<Impor
                 if (request.NotifyProgress)
                 {
                     var donePercentage = (100 * done) / (rowCount - 1);
-                    var errorPercentage = (100 * error) / (rowCount - 1);
-                    await notificationService.SendTaskStatus(request.GetUserId(), new(request.ImportTaskName, donePercentage, errorPercentage));
+                    await notificationService.SendTaskStatus(request.GetUserId(), new(request.ImportTaskName, donePercentage, 100 - donePercentage));
                 }
             }
         }

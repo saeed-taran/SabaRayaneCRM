@@ -1,4 +1,5 @@
 ﻿using SabaRayane.Contract.Dtos.Customers.Agreements;
+using SabaRayane.Contract.Dtos.Customers.CustomerAggregate;
 using SabaRayane.Contract.Dtos.s.Customers;
 using Taran.Shared.Dtos;
 using Taran.Shared.Dtos.WrappedResponse;
@@ -85,6 +86,16 @@ namespace Taran.UI.Main.Services.CustomerServices
         {
             return await httpService.Delete<bool?>(
                 baseUrl + "/Agreement" + $"/{id}"
+            );
+        }
+        #endregion
+
+        #region Notification services
+        public async Task<BackendResponse<PaginatedResponseDto<SearchNotificationResponseDto>>> SearchNotification(SearchNotificationRequestDto searchRequest)
+        {
+            return await httpService.Get<SearchNotificationRequestDto, PaginatedResponseDto<SearchNotificationResponseDto>>(
+                baseUrl + "/Notification",
+                searchRequest
             );
         }
         #endregion

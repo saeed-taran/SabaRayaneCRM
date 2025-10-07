@@ -40,12 +40,12 @@ Products: محصولات
 Customer: مشتری
 Product: محصول
 AgreementDate: تاریخ قرارداد
-DurationInMonths: طول به ماه
+DurationInMonths: مدت قرارداد به ماه
 ExtraUsersCount: تعداد کاربران اضافی
 Agreement: قرارداد
 Yes: بله
 Message: پیام
-DaysUntilAgreementExpire: DaysUntilAgreementExpire
+DaysUntilAgreementExpire: زمان ارسال (روز مانده به اتمام قرارداد)
 MessageTemplates: قالب پیام
 NewTemplate: قالب جدید
 Save: ذخیره
@@ -62,3 +62,10 @@ ColumnName: نام ستون
 ErrorMessage: پیام خطا
 Done: انجام شده
 TotalCount: تعداد کل
+Notifications: اطلاع رسانی
+NotificationStatus: وضعیت
+LastTryDate: آخرین تلاش برای ارسال
+TryCount: دفعات سعی برای ارسال
+ErrorDescription: متن خطا
+MessageTemplate: عنوان قالب
+EntityAlreadyExists: اطلاعات تکراری می باشد

@@ -34,5 +34,5 @@ function insertTextAtCursor(textareaId, text) {
 
     textarea.selectionStart = textarea.selectionEnd = start + text.length;
 
-    textarea.dispatchEvent(new Event('input'));
+    textarea.dispatchEvent(new Event('change'));
 }

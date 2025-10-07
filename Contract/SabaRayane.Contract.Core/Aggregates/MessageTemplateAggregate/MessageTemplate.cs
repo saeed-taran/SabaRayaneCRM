@@ -32,7 +32,7 @@ public class MessageTemplate : AggregateRoot<int>
             throw new DomainInvalidArgumentException(nameof(PlaceHolder));
 
         var result = Template;
-        var parameters = Template.Split(" ").Where(p => p.Trim().StartsWith("@"));
+        var parameters = Template.Split(" ").Where(p => p.Trim().Contains("@"));
 
         foreach (var parameter in parameters)
         {
@@ -46,7 +46,7 @@ public class MessageTemplate : AggregateRoot<int>
     public bool IsValid() 
     {
         var result = Template;
-        var parameters = Template.Split(" ").Where(p => p.Trim().StartsWith("@"));
+        var parameters = Template.Split(" ").Where(p => p.Trim().Contains("@"));
 
         return !parameters.Any(p => !PlaceHolder.PlaceHolders.ContainsKey(p));
     }

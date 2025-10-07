@@ -17,7 +17,7 @@ public class Notification : BaseEntity<long>
 
     public NotificationStatus NotificationStatus { get; private set; }
 
-    public DateTime LastTryDate { get; private set; }
+    public DateTime? LastTryDate { get; private set; }
     public int TryCount { get; private set; }
 
     [StringLength(250)]
