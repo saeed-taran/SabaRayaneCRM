@@ -116,6 +116,8 @@ public class ExcelService : IExcelService
                 var sampleValue = (property.PropertyType.IsValueType ? Activator.CreateInstance(property.PropertyType) : null);
                 if (sampleValue?.ToString() == "0")
                     sampleValue = 1;
+                else
+                    worksheet.Cells[2, col].Style.Numberformat.Format = "@";//text
                 worksheet.Cells[2, col].Value = sampleValue;
             }
         }

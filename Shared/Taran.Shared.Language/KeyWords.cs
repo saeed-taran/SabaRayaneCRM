@@ -72,5 +72,6 @@ public enum KeyWords
     TryCount,
     ErrorDescription,
     MessageTemplate,
-    Notifications
+    Notifications,
+    ImportingCustomer
 }

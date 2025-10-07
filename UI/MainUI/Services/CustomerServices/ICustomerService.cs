@@ -1,7 +1,9 @@
-﻿using SabaRayane.Contract.Dtos.Customers.Agreements;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using SabaRayane.Contract.Dtos.Customers.Agreements;
 using SabaRayane.Contract.Dtos.Customers.CustomerAggregate;
 using SabaRayane.Contract.Dtos.s.Customers;
 using Taran.Shared.Dtos;
+using Taran.Shared.Dtos.Dtos.IO;
 using Taran.Shared.Dtos.WrappedResponse;
 
 namespace Taran.UI.Main.Services.CustomerServices
@@ -13,6 +15,8 @@ namespace Taran.UI.Main.Services.CustomerServices
         Task<BackendResponse<bool?>> DeleteAgreement(int id);
         Task<BackendResponse<bool?>> DeleteCustomer(int id);
         Task<List<(int, string)>> GetCustomerDropDownItems(int skip, int take, string term);
+        string GetCustomerImportTemplateDownloadLink();
+        Task<BackendResponse<ImportDataResponseDto>> ImportCustomer(IBrowserFile browserFile);
         Task<BackendResponse<PaginatedResponseDto<SearchAgreementResponseDto>>> SearchAgreement(SearchAgreementRequestDto searchRequest);
         Task<BackendResponse<PaginatedResponseDto<SearchCustomerResponseDto>>> SearchCustomer(SearchCustomerRequestDto searchRequest);
         Task<BackendResponse<PaginatedResponseDto<SearchNotificationResponseDto>>> SearchNotification(SearchNotificationRequestDto searchRequest);

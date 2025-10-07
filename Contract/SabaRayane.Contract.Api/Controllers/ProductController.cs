@@ -40,7 +40,7 @@ public class ProductController : AuthorizedControllerBase
     [CustomeAuthorize((int)AccessNames.Product_Create)]
     public async Task<ActionResult> GetProductImportTemplate()
     {
-        GetImportTemplateQuery createExcelTemplateCommand = new(typeof(ImportProductCommand));
+        GetImportTemplateQuery createExcelTemplateCommand = new(typeof(ImportProductCommand), "Product_Import_Template");
 
         var response = await SendQuery(createExcelTemplateCommand);
         return File(response.Data!.ResultStream, response.Data.ContentType, response.Data.FileName);

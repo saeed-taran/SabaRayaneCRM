@@ -1,7 +1,9 @@
-﻿using SabaRayane.Contract.Dtos.Customers.Agreements;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using SabaRayane.Contract.Dtos.Customers.Agreements;
 using SabaRayane.Contract.Dtos.Customers.CustomerAggregate;
 using SabaRayane.Contract.Dtos.s.Customers;
 using Taran.Shared.Dtos;
+using Taran.Shared.Dtos.Dtos.IO;
 using Taran.Shared.Dtos.WrappedResponse;
 using Taran.Shared.UI.ConfigurationModels;
 using Taran.Shared.UI.Services;
@@ -25,6 +27,16 @@ namespace Taran.UI.Main.Services.CustomerServices
                 baseUrl,
                 searchRequest
             );
+        }
+
+        public string GetCustomerImportTemplateDownloadLink()
+        {
+            return baseUrl + $"/importTemplate";
+        }
+
+        public async Task<BackendResponse<ImportDataResponseDto>> ImportCustomer(IBrowserFile browserFile)
+        {
+            return await httpService.UploadFile<ImportDataResponseDto>(baseUrl + $"/import", browserFile);
         }
 
         public async Task<BackendResponse<bool?>> CreateCustomer(CreateCustomerRequestDto createRequestDto)

@@ -4,11 +4,29 @@
 @using Taran.Shared.Dtos.Languages
 @using Taran.Shared.Language
 @using Taran.Shared.Languages
+@using Taran.Shared.UI.Components.Bootstrap.Modal
 @using Taran.Shared.UI.Components.CustomizedQuickGrid
 @using Taran.Shared.UI.Components.CustomizedQuickGrid.Columns
+@using Taran.Shared.UI.Components.ImportResult
 @using Taran.UI.Main.Services.CustomerServices
 
 @inject ICustomerService customerService;
+
+
+<div class="border-bottom pb-3 pt-2 opacityBg">
+    <a class="btn btn-sm ms-2 border text-dark" href="@customerService.GetCustomerImportTemplateDownloadLink()">
+        <i class="fas fa-table text-primary"></i>
+        @translator.Translate(nameof(KeyWords.DownloadImportFileTemplate))
+    </a>
+
+    <InputFile OnChange=FileSelected accept=".xlsx" class="ms-4" />
+
+    <button @onclick=ImportFile class="btn btn-sm ms-2 border text-dark">
+        <i class="fas fa-upload text-dark"></i>
+        @translator.Translate(nameof(KeyWords.Import))
+    </button>
+</div>
+<hr />
 
 <QuickGrid Id="CustomerGrid" ItemsProvider="@GridItemsProvider" TGridItem="SearchCustomerResponseDto" Pagination="@pagination" @ref="grid" OnSaveEdit="SaveInlineEdit" EditingObjectType="typeof(UpdateCustomerRequestDto)" 
     OnSaveNew="SaveInlineCreate" CreatingObjectType="typeof(CreateCustomerRequestDto)" OnDelete="OnItemDelete" Class="table table-borderless" Theme="none"
@@ -50,6 +68,12 @@
     </div>
 </div>
 
+<BootstrapModal Id="ImportReportModal" BooststrapModalSize="BooststrapModalSize.lg" @ref=ImportReportModal>
+    <Body>
+        <ImportResultViewer @ref=importResultViewer></ImportResultViewer>
+    </Body>
+</BootstrapModal>
+
 @code {
     QuickGrid<SearchCustomerResponseDto>? grid;
     GridItemsProvider<SearchCustomerResponseDto>? GridItemsProvider;
@@ -57,6 +81,11 @@
     SearchCustomerRequestDto searchRequest = new();
 
     List<CustomeAction<SearchCustomerResponseDto>> customeActions = [];
+
+    IBrowserFile? selectedFile;
+
+    BootstrapModal ImportReportModal;
+    ImportResultViewer importResultViewer;
 
     protected override async Task OnInitializedAsync()
     {
@@ -78,6 +107,11 @@
     protected async Task ViewAgreementsClicked(SearchCustomerResponseDto item)
     {
         navigationManager.NavigateTo($"/agreement/{item.Id}");
+    }
+
+    protected async Task FileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
     }
 
     protected async Task FilterChanged()
@@ -102,5 +136,34 @@
         var request = (CreateCustomerRequestDto)createRequestDto;
         var result = await customerService.CreateCustomer(request);
         return new GridItemEditResult { Success = result.Success, ErrorMessage = result.ErrorMessage };
+    }
+
+    protected async Task ImportFile()
+    {
+        if (selectedFile is null)
+        {
+            await toastService.Show(translator.Translate(nameof(KeyWords.PleaseSelectAFileToImport)), ToastKind.danger);
+            return;
+        }
+
+        var response = await customerService.ImportCustomer(selectedFile);
+        if (response.Success)
+        {
+            if (response.Data.Error > 0)
+            {
+                importResultViewer.Refresh(response.Data);
+                await ImportReportModal.Open();
+            }
+            else
+            {
+                await toastService.Show(translator.Translate(nameof(KeyWords.OperationDoneSuccessfully)), ToastKind.success);
+            }
+
+            await grid!.RefreshDataAsync();
+        }
+        else if (!string.IsNullOrWhiteSpace(response.ErrorMessage))
+        {
+            await toastService.Show(response.ErrorMessage, ToastKind.danger);
+        }
     }
 }

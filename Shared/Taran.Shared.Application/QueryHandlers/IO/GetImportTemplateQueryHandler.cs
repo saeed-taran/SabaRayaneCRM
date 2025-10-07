@@ -18,6 +18,6 @@ public class GetImportTemplateQueryHandler : IRequestHandler<GetImportTemplateQu
     {
         var fileBytes = excelService.GenerateExcelWithValidation(request.DtoTypeToImport, request.FixedValues);
 
-        return new GetImportTemplateResponseDto(new MemoryStream(fileBytes), "application/octet-stream", "Template_.xlsx");
+        return new GetImportTemplateResponseDto(new MemoryStream(fileBytes), "application/octet-stream", $"{request.FileNameToSave}.xlsx");
     }
 }

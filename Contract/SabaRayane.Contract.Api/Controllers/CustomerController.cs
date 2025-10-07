@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SabaRayane.Contract.Application.Commands.Customers.Agreements;
+using SabaRayane.Contract.Application.Commands.Customers.Customers;
 using SabaRayane.Contract.Application.Commands.s.Customers;
 using SabaRayane.Contract.Application.Queries.Customers.Agreements;
 using SabaRayane.Contract.Application.Queries.Customers.CustomerAggregate;
@@ -8,7 +9,10 @@ using SabaRayane.Contract.Application.Queries.s.Customers;
 using Taran.Identity.Access;
 using Taran.Shared.Api.Attributes;
 using Taran.Shared.Api.Controllers;
+using Taran.Shared.Application.Commands.IO;
+using Taran.Shared.Application.Queries.IO;
 using Taran.Shared.Core.User;
+using Taran.Shared.Dtos.Languages;
 
 namespace SabaRayane.Contract.Api.Controllers;
 
@@ -33,6 +37,48 @@ public class CustomerController : AuthorizedControllerBase
     public async Task<ActionResult> Get([FromQuery] SearchCustomerQuery searchCustomerQuery)
     {
         return Ok(await SendQuery(searchCustomerQuery));
+    }
+
+    [HttpGet("importTemplate")]
+    [CustomeAuthorize((int)AccessNames.Customer_Create)]
+    public async Task<ActionResult> GetCustomerImportTemplate()
+    {
+        GetImportTemplateQuery createExcelTemplateCommand = new(typeof(ImportCustomerCommand), "Customer_Import_Template");
+
+        var response = await SendQuery(createExcelTemplateCommand);
+        return File(response.Data!.ResultStream, response.Data.ContentType, response.Data.FileName);
+    }
+
+    [HttpPost("import")]
+    [CustomeAuthorize((int)AccessNames.Customer_Create)]
+    public async Task<ActionResult> Import([FromForm] IFormFile file)
+    {
+        ImportDataCommand<ImportCustomerCommand>
+        importDataCommand = new(
+            nameof(KeyWords.ImportingCustomer),
+            notifyProgress: true,
+            file.OpenReadStream(),
+            (rowDictionary) =>
+            {
+                return new()
+                {
+                    CustomerId = rowDictionary[nameof(ImportCustomerCommand.CustomerId)]?.ToString(),
+                    FirstName = rowDictionary[nameof(ImportCustomerCommand.FirstName)]?.ToString(),
+                    LastName = rowDictionary[nameof(ImportCustomerCommand.LastName)]?.ToString(),
+                    MobileNumber = rowDictionary[nameof(ImportCustomerCommand.MobileNumber)]?.ToString(),
+                    StoreName = rowDictionary[nameof(ImportCustomerCommand.StoreName)]?.ToString(),
+                    Description = rowDictionary[nameof(ImportCustomerCommand.Description)]?.ToString()
+                };
+            },
+            async (createCommand) =>
+            {
+                await SendCommand(createCommand);
+            },
+            sendNotifEveryMilliSeconds: 200,
+            errorListMaxLenght: 50
+        );
+
+        return Ok(await SendCommand(importDataCommand));
     }
 
     [HttpPost]
