@@ -14,13 +14,8 @@ namespace Taran.Identity.Api.Controllers
 {
     public class UserController : AuthorizedControllerBase
     {
-        private readonly IJWTManager jWTManager;
-        private readonly IdentityConfiguration identityConfiguration;
-
         public UserController(IMediator mediator, IAppUser appUser, IHttpContextAccessor httpContextAccessor, IJWTManager jWTManager, IOptions<IdentityConfiguration> identityConfiguration) : base(mediator, appUser, httpContextAccessor)
         {
-            this.jWTManager = jWTManager;
-            this.identityConfiguration = identityConfiguration.Value;
         }
 
         #region User actions

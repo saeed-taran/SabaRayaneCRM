@@ -17,7 +17,6 @@ namespace Taran.Identity.Api.Controllers
     [Route("[controller]")]
     public class AuthController : UnAuthorizedControllerBase
     {
-        private readonly ILogger<AuthController> logger;
         private readonly IJWTManager jWTManager;
         private readonly IdentityConfiguration identityConfiguration;
 
@@ -26,7 +25,6 @@ namespace Taran.Identity.Api.Controllers
         {
             this.identityConfiguration = identityConfiguration.Value;
             this.jWTManager = jWTManager;
-            this.logger = logger;
         }
 
         [HttpPost]

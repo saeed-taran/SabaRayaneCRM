@@ -14,16 +14,9 @@ namespace Taran.Identity.Api.Controllers
 {
     public class RolesController : AuthorizedControllerBase
     {
-        private readonly ILogger<RolesController> logger;
-        private readonly IMediator mediator;
-        private readonly IAppUser appUser;
-
         public RolesController(IMediator mediator, ILogger<RolesController> logger, IAppUser appUser, IHttpContextAccessor httpContextAccessor) 
             : base(mediator, appUser, httpContextAccessor)
         {
-            this.logger = logger;
-            this.mediator = mediator;
-            this.appUser = appUser;
         }
 
         [HttpGet]

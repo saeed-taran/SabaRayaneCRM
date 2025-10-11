@@ -17,6 +17,7 @@ public class NotificationService : INotificationService
 
     public async Task SendTaskStatus(int userId, PushTaskStatusDto pushTaskStatusDto)
     {
+        //Sending the notification data to notification webApi
         await httpClient.PostAsJsonAsync($"{notificationConfiguration.ApiAddress}/Notification/TaskStatus/{userId}", pushTaskStatusDto);
     }
 }

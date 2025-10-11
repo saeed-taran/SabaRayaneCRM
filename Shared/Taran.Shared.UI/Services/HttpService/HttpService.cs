@@ -19,9 +19,9 @@ public class HttpService : IHttpService
     private readonly NavigationManager _navigationManager;
     private readonly NavigationConfiguration _navConfig;
 
-    public HttpService(HttpClient httpClient, ITranslator translator, NavigationManager navigationManager, NavigationConfiguration navConfig)
+    public HttpService(ITranslator translator, NavigationManager navigationManager, NavigationConfiguration navConfig, IHttpClientFactory httpClientFactory)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient();
         _translator = translator;
         _navigationManager = navigationManager;
         _navConfig = navConfig;

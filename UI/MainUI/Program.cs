@@ -37,7 +37,7 @@ builder.Services.AddScoped<ITranslator, TranslatorForFront>();
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped<HttpClient>();
+builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 builder.Services.AddScoped<ICookieStorageService, CookieStorageService>();

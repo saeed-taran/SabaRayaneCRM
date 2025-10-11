@@ -6,6 +6,7 @@ using SabaRayane.Contract.Core.Aggregates.MessageTemplateAggregate;
 using SabaRayane.Contract.Core.Specifications.Customers.Agreements;
 using SabaRayane.Contract.Core.Specifications.s.Customers;
 using SabaRayane.Contract.Core.Specifications.s.MessageTemplates;
+using SabaRayane.Notification.BackendService.Notifications;
 using Taran.Shared.Core.Exceptions;
 using Taran.Shared.Core.Repository;
 
@@ -17,13 +18,15 @@ public class CreatePossibleNotificationsCommandHandler : IRequestHandler<CreateP
     private readonly IGenericReadRepository<MessageTemplate, int> messageTemplateReadRepository;
     private readonly IGenericWriteRepository<Customer, int> customerWriteRepository;
     private readonly IUnitOfWork unitOfWork;
+    private readonly INotificationService notificationService;
 
-    public CreatePossibleNotificationsCommandHandler(IGenericReadRepository<Agreement, int> agreementReadRepository, IGenericReadRepository<MessageTemplate, int> messageTemplateReadRepository, IGenericWriteRepository<Customer, int> customerWriteRepository, IUnitOfWork unitOfWork)
+    public CreatePossibleNotificationsCommandHandler(IGenericReadRepository<Agreement, int> agreementReadRepository, IGenericReadRepository<MessageTemplate, int> messageTemplateReadRepository, IGenericWriteRepository<Customer, int> customerWriteRepository, IUnitOfWork unitOfWork, INotificationService notificationService)
     {
         this.agreementReadRepository = agreementReadRepository;
         this.messageTemplateReadRepository = messageTemplateReadRepository;
         this.customerWriteRepository = customerWriteRepository;
         this.unitOfWork = unitOfWork;
+        this.notificationService = notificationService;
     }
 
     public async Task<bool> Handle(CreatePossibleNotificationsCommand request, CancellationToken cancellationToken)

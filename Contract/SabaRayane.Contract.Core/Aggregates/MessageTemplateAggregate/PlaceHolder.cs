@@ -36,11 +36,11 @@ public class PlaceHolder
         return Id;
     }
 
-    public static PlaceHolder CustomerName = new(1, "Customer", $"@Customer", c => { return c.FullName; });
-    public static PlaceHolder StoreName = new(2, "Shop", $"@Shop", c => { return c.StoreName; });
-    public static PlaceHolder ProductName = new(3, "Product", $"@Product", c => { return c.Agreements.FirstOrDefault()?.Product.Name; });
-    public static PlaceHolder ProductPrice = new(4, "Price", $"@Price", c => { return c.Agreements.FirstOrDefault()?.Product.Price.ToString(); });
-    public static PlaceHolder ExtraUsersCount = new(6, "ExtraUserCount", "@ExtraUserCount", c => { return c.Agreements.FirstOrDefault()?.ExtraUsersCount.ToString(); });
+    public static readonly PlaceHolder CustomerName = new(1, "Customer", $"@Customer", c => { return c.FullName; });
+    public static readonly PlaceHolder StoreName = new(2, "Shop", $"@Shop", c => { return c.StoreName; });
+    public static readonly PlaceHolder ProductName = new(3, "Product", $"@Product", c => { return c.Agreements.FirstOrDefault()?.Product.Name; });
+    public static readonly PlaceHolder ProductPrice = new(4, "Price", $"@Price", c => { return c.Agreements.FirstOrDefault()?.Product.Price.ToString(); });
+    public static readonly PlaceHolder ExtraUsersCount = new(6, "ExtraUserCount", "@ExtraUserCount", c => { return c.Agreements.FirstOrDefault()?.ExtraUsersCount.ToString(); });
 
     public static Dictionary<string, PlaceHolder> PlaceHolders = new() 
     {
